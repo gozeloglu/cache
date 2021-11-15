@@ -43,3 +43,7 @@ func main() {
 	}
 }
 ```
+
+### LICENSE
+
+[MIT](https://github.com/gozeloglu/cache/blob/main/LICENSE)
