@@ -92,6 +92,24 @@ func (c *Cache) Add(key string, val interface{}, exp time.Duration) error {
 	return nil
 }
 
+// Get retrieves the data from list and returns it with bool information which
+// indicates whether found. If there is no such data in cache, it returns nil
+// and false.
+func (c *Cache) Get(key string) (interface{}, bool) {
+	if c.Len == 0 {
+		return nil, false
+	}
+	c.mu.Lock()
+	val, found := c.get(key)
+	if val == nil {
+		c.mu.Unlock()
+		return nil, found
+	}
+	c.lst.PushFront(val)
+	c.mu.Unlock()
+	return val.Value.(Item).Val, found
+}
+
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
 func (c *Cache) get(key string) (*list.Element, bool) {
