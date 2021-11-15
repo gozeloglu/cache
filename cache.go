@@ -55,6 +55,9 @@ func New(cap int, config Config) (*Cache, error) {
 	if cap == 0 {
 		return nil, errors.New("capacity of the cache must be more than 0")
 	}
+	if cap < 0 {
+		return nil, errors.New("capacity cannot be negative")
+	}
 	lst := list.New()
 	return &Cache{
 		Cap:                       cap,

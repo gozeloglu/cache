@@ -62,3 +62,19 @@ func TestCache_AddWithReplace(t *testing.T) {
 	t.Logf("%s-%s", fKey, fVal)
 	t.Logf("%s-%s", sKey, sVal)
 }
+
+func TestCache_NewZeroCap(t *testing.T) {
+	_, err := New(0, Config{})
+	if err == nil {
+		t.Errorf("expected non-nil error, but got nil error.")
+	}
+	t.Logf(err.Error())
+}
+
+func TestCache_NewNegativeCap(t *testing.T) {
+	_, err := New(-1, Config{})
+	if err == nil {
+		t.Errorf("expected non-nil error, but got nil error.")
+	}
+	t.Logf(err.Error())
+}
