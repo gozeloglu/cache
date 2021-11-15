@@ -62,6 +62,9 @@ func TestCache_AddWithReplace(t *testing.T) {
 			t.Errorf("len must be 2, but it is %v", cache.Len)
 		}
 	}
+	if cache.Len != 2 {
+		t.Errorf("len needs to be 2, but it is %v", cache.Len)
+	}
 	fKey, fVal := cache.lst.Front().Value.(Item).Val.(string), cache.lst.Front().Value.(Item).Key
 	sKey, sVal := cache.lst.Back().Value.(Item).Val.(string), cache.lst.Back().Value.(Item).Key
 	t.Logf("%s-%s", fKey, fVal)
@@ -127,4 +130,40 @@ func TestCache_GetNotFound(t *testing.T) {
 	if val != nil {
 		t.Errorf("expected nil, but got %v", val)
 	}
+}
+
+func TestCache_Remove(t *testing.T) {
+	cache, err := New(2, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache created.")
+
+	err = cache.Add(k, v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added.", k, v)
+	err = cache.Remove(k)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if cache.Len != 0 {
+		t.Errorf("cache length should be 0, but got %v", cache.Len)
+	}
+	t.Logf("%s-%s pair removed successfully.", k, v)
+}
+
+func TestCache_RemoveEmptyCache(t *testing.T) {
+	cache, err := New(1, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache created.")
+
+	err = cache.Remove(k)
+	if err == nil {
+		t.Errorf("error needs to be non-nil, but it is nil.")
+	}
+	t.Logf(err.Error())
 }

@@ -110,6 +110,19 @@ func (c *Cache) Get(key string) (interface{}, bool) {
 	return val.Value.(Item).Val, found
 }
 
+// Remove deletes the item from the cache. Updates the length of the cache
+// decrementing by one.
+func (c *Cache) Remove(key string) error {
+	if c.Len == 0 {
+		return errors.New("empty cache")
+	}
+
+	c.mu.Lock()
+	c.delete(key)
+	c.mu.Unlock()
+	return nil
+}
+
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
 func (c *Cache) get(key string) (*list.Element, bool) {
@@ -128,6 +141,7 @@ func (c *Cache) delete(key string) {
 		return
 	}
 	c.lst.Remove(v)
+	c.Len--
 }
 
 // getLRU returns least recently used item from list.
