@@ -15,11 +15,17 @@ type Cache struct {
 	// Cap is the maximum capacity of the cache.
 	Cap int
 
+	// CleanInterval is the time duration to make cache empty.
+	CleanInterval time.Duration
+
+	// ExpirationTimeoutInterval indicates the time to delete expired items.
+	ExpirationTimeoutInterval time.Duration
+
 	// mu is the mutex variable to prevent race conditions.
 	mu sync.Mutex
 
 	// lst is the doubly-linked list that stores the cached data.
-	lst list.List
+	lst *list.List
 }
 
 // Item is the cached data type.
@@ -32,6 +38,31 @@ type Item struct {
 
 	// Expiration is the amount of time to saved on memory.
 	Expiration time.Duration
+}
+
+// Config keeps configuration variables.
+type Config struct {
+	// CleanInterval is the time duration to make cache empty.
+	CleanInterval time.Duration
+
+	// ExpirationTimeoutInterval indicates the time to delete expired items.
+	ExpirationTimeoutInterval time.Duration
+}
+
+// New creates a new cache and returns it with error type. Capacity of the cache
+// needs to be more than zero.
+func New(cap int, config Config) (*Cache, error) {
+	if cap == 0 {
+		return nil, errors.New("capacity of the cache must be more than 0")
+	}
+	lst := list.New()
+	return &Cache{
+		Cap:                       cap,
+		CleanInterval:             config.CleanInterval,
+		ExpirationTimeoutInterval: config.ExpirationTimeoutInterval,
+		mu:                        sync.Mutex{},
+		lst:                       lst,
+	}, nil
 }
 
 // Add saves data to cache if it is not saved yet.
@@ -47,12 +78,13 @@ func (c *Cache) Add(key string, val interface{}, exp time.Duration) error {
 	}
 	if c.Len == c.Cap {
 		c.mu.Lock()
-		c.delete(key)
+		lruKey := c.getLRU()
+		c.delete(lruKey.Key)
 		c.mu.Unlock()
 	}
 	c.mu.Lock()
 	c.lst.PushFront(item)
-	c.Len += 1
+	c.Len++
 	c.mu.Unlock()
 	return nil
 }
@@ -75,4 +107,9 @@ func (c *Cache) delete(key string) {
 		return
 	}
 	c.lst.Remove(v)
+}
+
+// getLRU returns least recently used item from list.
+func (c *Cache) getLRU() Item {
+	return c.lst.Back().Value.(Item)
 }
