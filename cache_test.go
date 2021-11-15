@@ -167,3 +167,32 @@ func TestCache_RemoveEmptyCache(t *testing.T) {
 	}
 	t.Logf(err.Error())
 }
+
+func TestCache_AddRemoveGet(t *testing.T) {
+	cache, err := New(1, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache created.")
+
+	err = cache.Add(k, v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added.", k, v)
+
+	err = cache.Remove(k)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s removed.", k, v)
+
+	val, found := cache.Get(k)
+	if found {
+		t.Errorf("found needs to be false, but it is true")
+	}
+	if val != nil {
+		t.Errorf("val needs to be nil, but it is %v", val)
+	}
+	t.Logf("not accessed %s-%s", k, v)
+}
