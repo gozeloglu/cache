@@ -15,7 +15,7 @@ func main() {
 
 	err = c.Add("foo", "bar", 0)
 	if err != nil {
-		log.Printf(err.Error())
+		log.Printf("%s\n", err.Error())
 	}
 	_ = c.Add("key", "val", 0)
 
@@ -24,6 +24,12 @@ func main() {
 		log.Printf("data not exists in cache.")
 	}
 	if val != nil {
-		fmt.Printf("key: foo\nvalue: %s", val)
+		fmt.Printf("key: foo\nvalue: %s\n", val)
 	}
+
+	err = c.Remove("foo")
+	if err != nil {
+		log.Printf("%s\n", err.Error())
+	}
+	log.Printf("foo removed from cache.")
 }
