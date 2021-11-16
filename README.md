@@ -47,8 +47,24 @@ func main() {
 	if err != nil {
 		log.Printf("%s\n", err.Error())
 	}
-	log.Printf("foo removed from cache.")
+
+	found = c.Contains("key")
+	if found {
+		fmt.Println("key found in cache.")
+	} else {
+		fmt.Println("key does not exist in cache.")
+	}
+
+	found = c.Contains("foo")
+	if found {
+		fmt.Println("foo found in cache.")
+	} else {
+		fmt.Println("foo does not exist in cache.")
+	}
+
+	fmt.Printf("cache length: %v", c.Len)
 }
+
 ```
 
 ### LICENSE
