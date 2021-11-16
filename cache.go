@@ -105,7 +105,7 @@ func (c *Cache) Get(key string) (interface{}, bool) {
 		c.mu.Unlock()
 		return nil, found
 	}
-	c.lst.PushFront(val)
+	c.lst.PushFront(val.Value.(Item))
 	c.mu.Unlock()
 	return val.Value.(Item).Val, found
 }
