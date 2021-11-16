@@ -132,6 +132,144 @@ func TestCache_GetNotFound(t *testing.T) {
 	}
 }
 
+func TestCache_GetFrontElement(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache created.")
+
+	err = cache.Add(k, v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added", k, v)
+
+	err = cache.Add(k+k, v+v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added", k+k, v+v)
+
+	err = cache.Add(k+k+k, v+v+v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added", k+k+k, v+v+v)
+
+	val, found := cache.Get(k + k + k)
+	if !found {
+		t.Errorf("%s needs to be found, but didn't found.", k+k+k)
+	}
+	if val != v+v+v {
+		t.Errorf("expected value is %s, got %s", v+v+v, val)
+	}
+	if cache.Len != cache.lst.Len() {
+		t.Errorf("expected value is %s, got %s", v+v+v, val)
+	}
+	order := []string{k + k + k, k + k, k}
+	i := 0
+	for e := cache.lst.Front(); e != nil; e = e.Next() {
+		if e.Value.(Item).Key != order[i] {
+			t.Errorf("order of the keys is wrong. expected %s, got %s", order[i], e.Value.(Item).Key)
+		}
+		i++
+	}
+	t.Logf("cache order is true")
+}
+
+func TestCache_GetMiddleElement(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache created.")
+
+	err = cache.Add(k, v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added", k, v)
+
+	err = cache.Add(k+k, v+v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added", k+k, v+v)
+
+	err = cache.Add(k+k+k, v+v+v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added", k+k+k, v+v+v)
+
+	val, found := cache.Get(k + k)
+	if !found {
+		t.Errorf("%s needs to be found, but didn't found.", k+k)
+	}
+	if val != v+v {
+		t.Errorf("expected value is %s, got %s", v+v, val)
+	}
+	if cache.Len != cache.lst.Len() {
+		t.Errorf("cache length is wrong. want %v, got %v", cache.Len, cache.lst.Len())
+	}
+	order := []string{k + k, k + k + k, k}
+	i := 0
+	for e := cache.lst.Front(); e != nil; e = e.Next() {
+		if e.Value.(Item).Key != order[i] {
+			t.Errorf("order of the keys is wrong. expected %s, got %s", order[i], e.Value.(Item).Key)
+		}
+		i++
+	}
+	t.Logf("cache order is true")
+}
+
+func TestCache_GetBackElement(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache created.")
+
+	err = cache.Add(k, v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added", k, v)
+
+	err = cache.Add(k+k, v+v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added", k+k, v+v)
+
+	err = cache.Add(k+k+k, v+v+v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added", k+k+k, v+v+v)
+
+	val, found := cache.Get(k)
+	if !found {
+		t.Errorf("%s needs to be found, but didn't found.", k)
+	}
+	if val != v {
+		t.Errorf("expected value is %s, got %s", v, val)
+	}
+	if cache.Len != cache.lst.Len() {
+		t.Errorf("expected value is %s, got %s", v, val)
+	}
+	order := []string{k, k + k + k, k + k}
+	i := 0
+	for e := cache.lst.Front(); e != nil; e = e.Next() {
+		if e.Value.(Item).Key != order[i] {
+			t.Errorf("order of the keys is wrong. expected %s, got %s", order[i], e.Value.(Item).Key)
+		}
+		i++
+	}
+	t.Logf("cache order is true")
+}
+
 func TestCache_Remove(t *testing.T) {
 	cache, err := New(2, Config{})
 	if err != nil {
