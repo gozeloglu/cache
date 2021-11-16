@@ -4,6 +4,10 @@ cache is LRU-based cache package written in vanilla Go - with no package depende
 Used** and it is one of the famous cache replacement algorithm. It replaces newly added data with the least recently
 used one.
 
+* Written in Vanilla Go, with no dependencies.
+* Safe for concurrent use.
+* Supports any data type for values.
+
 ### Installation
 
 You can install like this:
