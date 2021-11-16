@@ -1,7 +1,8 @@
 # cache
 
-cache is LRU-based cache package written in Go. LRU stands for **Least Recently Used** and it is one of the famous cache
-replacement algorithm. It replaces newly added data with the least recently used one.
+cache is LRU-based cache package written in vanilla Go - with no package dependency. LRU stands for **Least Recently
+Used** and it is one of the famous cache replacement algorithm. It replaces newly added data with the least recently
+used one.
 
 ### Installation
 
