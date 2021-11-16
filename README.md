@@ -62,7 +62,14 @@ func main() {
 		fmt.Println("foo does not exist in cache.")
 	}
 
-	fmt.Printf("cache length: %v", c.Len)
+	fmt.Printf("cache length: %v\n", c.Len)
+
+	c.Clear()
+	fmt.Printf("cache cleared. length is %v\n", c.Len)
+	val, found = c.Get("foo")
+	if !found {
+		fmt.Println("key does not exist.")
+	}
 }
 
 ```
