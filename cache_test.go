@@ -575,7 +575,7 @@ func TestCache_PeekFreqCheck(t *testing.T) {
 	if val != v {
 		t.Errorf("expected value is %s, but got %s", v, val)
 	}
-	
+
 	order := []string{k + k + k, k + k, k}
 	for e, i := cache.lst.Front(), 0; e != nil; e = e.Next() {
 		if tmpEle := e.Value.(Item).Key; order[i] != tmpEle {

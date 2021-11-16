@@ -75,6 +75,14 @@ func main() {
 		fmt.Println("foo does not exist in cache.")
 	}
 
+	// Peek one of the key without updating access order.
+	val, found = c.Peek("key")
+	if found {
+		fmt.Println("key found in cache. value is", val)
+	} else {
+		fmt.Println("key does not exist in cache.")
+	}
+
 	// Clear cache. Remove everything from cache.
 	c.Clear()
 	fmt.Printf("cache cleared. length is %v\n", c.Len)
