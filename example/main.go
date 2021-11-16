@@ -13,6 +13,7 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
+	// Add key-value pairs to cache
 	err = c.Add("foo", "bar", 0)
 	if err != nil {
 		log.Printf("%s\n", err.Error())
@@ -20,6 +21,7 @@ func main() {
 	_ = c.Add("key", "val", 0)
 	_ = c.Add("fuzz", "buzz", 0)
 
+	// Retrieve value via key
 	val, found := c.Get("foo")
 	if !found {
 		log.Printf("data not exists in cache.")
@@ -28,6 +30,7 @@ func main() {
 		fmt.Printf("key: foo\nvalue: %s\n", val)
 	}
 
+	// Get all keys from cache
 	fmt.Println("Keys:")
 	keys := c.Keys()
 	for _, k := range keys {
@@ -35,11 +38,13 @@ func main() {
 	}
 	fmt.Printf("cache length: %v\n", c.Len)
 
+	// Remove data from cache via key
 	err = c.Remove("foo")
 	if err != nil {
 		log.Printf("%s\n", err.Error())
 	}
 
+	// Check the given key whether exists.
 	found = c.Contains("key")
 	if found {
 		fmt.Println("key found in cache.")
@@ -54,6 +59,7 @@ func main() {
 		fmt.Println("foo does not exist in cache.")
 	}
 
+	// Clear cache. Remove everything from cache.
 	c.Clear()
 	fmt.Printf("cache cleared. length is %v\n", c.Len)
 	val, found = c.Get("foo")

@@ -148,7 +148,8 @@ func (c *Cache) Clear() {
 	c.mu.Unlock()
 }
 
-// Keys returns all keys in cache.
+// Keys returns all keys in cache. It does not change frequency of the item
+// access.
 func (c *Cache) Keys() []string {
 	var keys []string
 
