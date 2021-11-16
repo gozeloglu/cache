@@ -139,23 +139,18 @@ func TestCache_GetFrontElement(t *testing.T) {
 	}
 	t.Logf("cache created.")
 
-	err = cache.Add(k, v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
 	}
-	t.Logf("%s-%s added", k, v)
-
-	err = cache.Add(k+k, v+v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
 	}
-	t.Logf("%s-%s added", k+k, v+v)
-
-	err = cache.Add(k+k+k, v+v+v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	t.Logf("%s-%s added", k+k+k, v+v+v)
 
 	val, found := cache.Get(k + k + k)
 	if !found {
@@ -185,23 +180,18 @@ func TestCache_GetMiddleElement(t *testing.T) {
 	}
 	t.Logf("cache created.")
 
-	err = cache.Add(k, v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
 	}
-	t.Logf("%s-%s added", k, v)
-
-	err = cache.Add(k+k, v+v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
 	}
-	t.Logf("%s-%s added", k+k, v+v)
-
-	err = cache.Add(k+k+k, v+v+v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	t.Logf("%s-%s added", k+k+k, v+v+v)
 
 	val, found := cache.Get(k + k)
 	if !found {
@@ -231,23 +221,18 @@ func TestCache_GetBackElement(t *testing.T) {
 	}
 	t.Logf("cache created.")
 
-	err = cache.Add(k, v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
 	}
-	t.Logf("%s-%s added", k, v)
-
-	err = cache.Add(k+k, v+v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
 	}
-	t.Logf("%s-%s added", k+k, v+v)
-
-	err = cache.Add(k+k+k, v+v+v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	t.Logf("%s-%s added", k+k+k, v+v+v)
 
 	val, found := cache.Get(k)
 	if !found {
@@ -401,23 +386,18 @@ func TestCache_ContainsCacheOrder(t *testing.T) {
 	}
 	t.Logf("cache cretead.")
 
-	err = cache.Add(k, v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
 	}
-	t.Logf("%s-%s added.", k, v)
-
-	err = cache.Add(k+k, v+v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
 	}
-	t.Logf("%s-%s added.", k+k, v+v)
-
-	err = cache.Add(k+k+k, v+v+v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	t.Logf("%s-%s added.", k+k+k, v+v+v)
 
 	order := []string{k + k + k, k + k, k}
 	i := 0
