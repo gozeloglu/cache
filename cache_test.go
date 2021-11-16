@@ -471,3 +471,52 @@ func TestCache_ClearEmptyCache(t *testing.T) {
 
 	t.Logf("empty cache cleared.")
 }
+
+func TestCache_Keys(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+	}
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+
+	keys := cache.Keys()
+	if len(keys) != cache.Len {
+		t.Errorf("keys length and cache length are not the same.\nkeys length: %v, cache length: %v", len(keys), cache.Len)
+	}
+	if len(keys) != len(pairs) {
+		t.Errorf("keys length and pairs length are not the same.\nkeys length: %v, cache length: %v", len(keys), len(pairs))
+	}
+	for i, j := len(pairs)-1, 0; i >= 0; i-- {
+		if keys[i] != pairs[j][0] {
+			t.Errorf("%s and %s are not the same.", keys[i], pairs[j][0])
+		}
+		j++
+	}
+}
+
+func TestCache_KeysEmptyCache(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	keys := cache.Keys()
+	if len(keys) != cache.Len {
+		t.Errorf("keys length and cache length are not the same.\nkeys length: %v, cache length: %v", len(keys), cache.Len)
+	}
+	t.Logf("cache is empty.")
+}

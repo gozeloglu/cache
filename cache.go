@@ -148,6 +148,19 @@ func (c *Cache) Clear() {
 	c.mu.Unlock()
 }
 
+// Keys returns all keys in cache.
+func (c *Cache) Keys() []string {
+	var keys []string
+
+	c.mu.Lock()
+	for e := c.lst.Front(); e != nil; e = e.Next() {
+		keys = append(keys, e.Value.(Item).Key)
+	}
+	c.mu.Unlock()
+
+	return keys
+}
+
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
 func (c *Cache) get(key string) (*list.Element, bool) {
