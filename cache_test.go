@@ -196,3 +196,98 @@ func TestCache_AddRemoveGet(t *testing.T) {
 	}
 	t.Logf("not accessed %s-%s", k, v)
 }
+
+func TestCache_Contains(t *testing.T) {
+	cache, err := New(1, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	err = cache.Add(k, v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added.", k, v)
+
+	found := cache.Contains(k)
+	if !found {
+		t.Errorf("%s needs to be found, but it is not found.", k)
+	}
+	t.Log(found)
+	t.Logf("%s found.", k)
+}
+
+func TestCache_ContainsEmptyCache(t *testing.T) {
+	cache, err := New(1, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	found := cache.Contains(k)
+	if found {
+		t.Errorf("%s needs to be not exists, but it is found.", k)
+	}
+	if cache.Len != 0 {
+		t.Errorf("cache needs to be empty, but it is not. len: %v", cache.Len)
+	}
+	t.Log(found)
+	t.Logf("%s does not exists.", k)
+}
+
+func TestCache_ContainsNonExistKey(t *testing.T) {
+	cache, err := New(1, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	err = cache.Add(k, v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added.", k, v)
+
+	found := cache.Contains(k + k)
+	if found {
+		t.Errorf("%s needs to be not exists, but it is found.", k)
+	}
+	t.Logf("%s does not exist.", k+k)
+}
+
+func TestCache_ContainsCacheOrder(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	err = cache.Add(k, v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added.", k, v)
+
+	err = cache.Add(k+k, v+v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added.", k+k, v+v)
+
+	err = cache.Add(k+k+k, v+v+v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added.", k+k+k, v+v+v)
+
+	order := []string{k + k + k, k + k, k}
+	i := 0
+	for e := cache.lst.Front(); e != nil; e = e.Next() {
+		if e.Value.(Item).Key != order[i] {
+			t.Errorf("order of the keys is wrong. expected %s, got %s", order[i], e.Value.(Item).Key)
+		}
+		i++
+	}
+	t.Logf("cache order is true")
+}

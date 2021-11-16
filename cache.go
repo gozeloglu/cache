@@ -123,6 +123,23 @@ func (c *Cache) Remove(key string) error {
 	return nil
 }
 
+// Contains checks the given key and returns the information that it exists
+// on cache or not. Calling this function doesn't change the access order of
+// the cache.
+func (c *Cache) Contains(key string) bool {
+	if c.Len == 0 {
+		return false
+	}
+	c.mu.Lock()
+	_, found := c.get(key)
+	if found {
+		c.mu.Unlock()
+		return true
+	}
+	c.mu.Unlock()
+	return false
+}
+
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
 func (c *Cache) get(key string) (*list.Element, bool) {
