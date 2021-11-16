@@ -500,3 +500,88 @@ func TestCache_KeysEmptyCache(t *testing.T) {
 	}
 	t.Logf("cache is empty.")
 }
+
+func TestCache_Peek(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+	}
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+
+	val, found := cache.Peek(k)
+	if !found {
+		t.Errorf("%s needs to be found, but couldn't found", k)
+	}
+	if val != v {
+		t.Errorf("expected value is %s, but got %s", v, val)
+	}
+	t.Logf("peek works successfully.")
+}
+
+func TestCache_PeekEmptyCache(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	val, found := cache.Peek(k)
+	if found {
+		t.Errorf("%s needs to be not found, but it is found", k)
+	}
+	if val != nil {
+		t.Errorf("expected value is %s, but got %s", v, val)
+	}
+	t.Logf("peek works successfully with empty cache.")
+}
+
+func TestCache_PeekFreqCheck(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+	}
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+
+	val, found := cache.Peek(k)
+	if !found {
+		t.Errorf("%s needs to be found, but couldn't found", k)
+	}
+	if val != v {
+		t.Errorf("expected value is %s, but got %s", v, val)
+	}
+	
+	order := []string{k + k + k, k + k, k}
+	for e, i := cache.lst.Front(), 0; e != nil; e = e.Next() {
+		if tmpEle := e.Value.(Item).Key; order[i] != tmpEle {
+			t.Errorf("expected %s, got %s", order[i], tmpEle)
+		}
+		i++
+	}
+	t.Logf("cache order is true after peek.")
+}
