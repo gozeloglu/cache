@@ -429,3 +429,45 @@ func TestCache_ContainsCacheOrder(t *testing.T) {
 	}
 	t.Logf("cache order is true")
 }
+
+func TestCache_Clear(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	err = cache.Add(k, v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added.", k, v)
+
+	cache.Clear()
+	if cache.Len != 0 {
+		t.Errorf("expected length is %v, got %v", 0, cache.Len)
+	}
+	if cache.lst.Len() != 0 {
+		t.Errorf("expected length of list.Len() is %v, got %v", 0, cache.lst.Len())
+	}
+
+	t.Logf("cache cleared.")
+}
+
+func TestCache_ClearEmptyCache(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	cache.Clear()
+	if cache.Len != 0 {
+		t.Errorf("expected length is %v, got %v", 0, cache.Len)
+	}
+	if cache.lst.Len() != 0 {
+		t.Errorf("expected length of list.Len() is %v, got %v", 0, cache.lst.Len())
+	}
+
+	t.Logf("empty cache cleared.")
+}

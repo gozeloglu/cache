@@ -141,6 +141,13 @@ func (c *Cache) Contains(key string) bool {
 	return false
 }
 
+// Clear deletes all items from the cache.
+func (c *Cache) Clear() {
+	c.mu.Lock()
+	c.clear()
+	c.mu.Unlock()
+}
+
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
 func (c *Cache) get(key string) (*list.Element, bool) {
@@ -165,4 +172,12 @@ func (c *Cache) delete(key string) {
 // getLRU returns least recently used item from list.
 func (c *Cache) getLRU() Item {
 	return c.lst.Back().Value.(Item)
+}
+
+// clear removes all elements from the list.
+func (c *Cache) clear() {
+	for e := c.lst.Front(); e != nil; e = e.Next() {
+		c.lst.Remove(e)
+		c.Len--
+	}
 }
