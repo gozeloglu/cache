@@ -88,6 +88,14 @@ func main() {
 		fmt.Println("key does not exist in cache.")
 	}
 
+	// Remove the oldest element from the cache
+	k, v, ok := c.RemoveOldest()
+	if ok {
+		fmt.Printf("Oldest data (%s-%s) pair is removed.\n", k, v)
+	} else {
+		fmt.Println("Oldest data in cache did not remove.")
+	}
+	
 	// Clear cache. Remove everything from cache.
 	c.Clear()
 	fmt.Printf("cache cleared. length is %v\n", c.Len)
