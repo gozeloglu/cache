@@ -6,7 +6,7 @@ used one.
 
 * Written in Vanilla Go, with no dependencies.
 * Safe for concurrent use.
-* Supports any data type for values.
+* Supports any data type for keys and values.
 
 ### Installation
 

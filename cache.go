@@ -31,7 +31,7 @@ type Cache struct {
 // Item is the cached data type.
 type Item struct {
 	// Key is the value's key.
-	Key string
+	Key interface{}
 
 	// Val is the value of the cached data.
 	Val interface{}
@@ -69,7 +69,7 @@ func New(cap int, config Config) (*Cache, error) {
 }
 
 // Add saves data to cache if it is not saved yet.
-func (c *Cache) Add(key string, val interface{}, exp time.Duration) error {
+func (c *Cache) Add(key interface{}, val interface{}, exp time.Duration) error {
 	_, found := c.get(key)
 	if found {
 		return errors.New("key already exists")
@@ -95,7 +95,7 @@ func (c *Cache) Add(key string, val interface{}, exp time.Duration) error {
 // Get retrieves the data from list and returns it with bool information which
 // indicates whether found. If there is no such data in cache, it returns nil
 // and false.
-func (c *Cache) Get(key string) (interface{}, bool) {
+func (c *Cache) Get(key interface{}) (interface{}, bool) {
 	if c.Len() == 0 {
 		return nil, false
 	}
@@ -113,7 +113,7 @@ func (c *Cache) Get(key string) (interface{}, bool) {
 
 // Remove deletes the item from the cache. Updates the length of the cache
 // decrementing by one.
-func (c *Cache) Remove(key string) error {
+func (c *Cache) Remove(key interface{}) error {
 	if c.Len() == 0 {
 		return errors.New("empty cache")
 	}
@@ -127,7 +127,7 @@ func (c *Cache) Remove(key string) error {
 // Contains checks the given key and returns the information that it exists
 // on cache or not. Calling this function doesn't change the access order of
 // the cache.
-func (c *Cache) Contains(key string) bool {
+func (c *Cache) Contains(key interface{}) bool {
 	if c.Len() == 0 {
 		return false
 	}
@@ -150,8 +150,8 @@ func (c *Cache) Clear() {
 
 // Keys returns all keys in cache. It does not change frequency of the item
 // access.
-func (c *Cache) Keys() []string {
-	var keys []string
+func (c *Cache) Keys() []interface{} {
+	var keys []interface{}
 
 	c.mu.Lock()
 	for e := c.lst.Front(); e != nil; e = e.Next() {
@@ -163,7 +163,7 @@ func (c *Cache) Keys() []string {
 }
 
 // Peek returns the given key without updating access frequency of the item.
-func (c *Cache) Peek(key string) (interface{}, bool) {
+func (c *Cache) Peek(key interface{}) (interface{}, bool) {
 	if c.Len() == 0 {
 		return nil, false
 	}
@@ -175,7 +175,7 @@ func (c *Cache) Peek(key string) (interface{}, bool) {
 
 // RemoveOldest removes the least recently used one. Returns removed key, value,
 // and bool value that indicates whether remove operation is done successfully.
-func (c *Cache) RemoveOldest() (k string, v interface{}, ok bool) {
+func (c *Cache) RemoveOldest() (k interface{}, v interface{}, ok bool) {
 	c.mu.Lock()
 	k, v, ok = c.removeOldest()
 	c.mu.Unlock()
@@ -205,7 +205,7 @@ func (c *Cache) Cap() int {
 
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
-func (c *Cache) get(key string) (*list.Element, bool) {
+func (c *Cache) get(key interface{}) (*list.Element, bool) {
 	for e := c.lst.Front(); e != nil; e = e.Next() {
 		if e.Value.(Item).Key == key {
 			return e, true
@@ -215,7 +215,7 @@ func (c *Cache) get(key string) (*list.Element, bool) {
 }
 
 // delete removes the cached data from the list.
-func (c *Cache) delete(key string) {
+func (c *Cache) delete(key interface{}) {
 	v, found := c.get(key)
 	if !found {
 		return
@@ -238,7 +238,7 @@ func (c *Cache) clear() {
 }
 
 // removeOldest removes the oldest data from the cache.
-func (c *Cache) removeOldest() (key string, val interface{}, ok bool) {
+func (c *Cache) removeOldest() (key interface{}, val interface{}, ok bool) {
 	if c.Len() == 0 {
 		return "", nil, false
 	}
