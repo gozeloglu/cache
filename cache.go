@@ -9,17 +9,17 @@ import (
 
 // Cache is the main cache type.
 type Cache struct {
-	// len is the total cached data count.
-	len int
-
-	// Cap is the maximum capacity of the cache.
-	Cap int
-
 	// CleanInterval is the time duration to make cache empty.
 	CleanInterval time.Duration
 
 	// ExpirationTimeoutInterval indicates the time to delete expired items.
 	ExpirationTimeoutInterval time.Duration
+
+	// len is the total cached data count.
+	len int
+
+	// cap is the maximum capacity of the cache.
+	cap int
 
 	// mu is the mutex variable to prevent race conditions.
 	mu sync.Mutex
@@ -60,7 +60,7 @@ func New(cap int, config Config) (*Cache, error) {
 	}
 	lst := list.New()
 	return &Cache{
-		Cap:                       cap,
+		cap:                       cap,
 		CleanInterval:             config.CleanInterval,
 		ExpirationTimeoutInterval: config.ExpirationTimeoutInterval,
 		mu:                        sync.Mutex{},
@@ -79,7 +79,7 @@ func (c *Cache) Add(key string, val interface{}, exp time.Duration) error {
 		Val:        val,
 		Expiration: exp,
 	}
-	if c.Len() == c.Cap {
+	if c.Len() == c.Cap() {
 		c.mu.Lock()
 		lruKey := c.getLRU()
 		c.delete(lruKey.Key)
@@ -198,6 +198,11 @@ func (c *Cache) Len() int {
 	return c.len
 }
 
+// Cap returns capacity of the cache.
+func (c *Cache) Cap() int {
+	return c.cap
+}
+
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
 func (c *Cache) get(key string) (*list.Element, bool) {
@@ -255,7 +260,7 @@ func (c *Cache) resize(size int) int {
 	for i := 0; i < diff; i++ {
 		c.removeOldest()
 	}
-	c.Cap = size
+	c.cap = size
 
 	return diff
 }

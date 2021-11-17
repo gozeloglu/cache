@@ -17,7 +17,7 @@ func TestCache_Add(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	c := cache.Cap
+	c := cache.Cap()
 	if c != 3 {
 		t.Errorf("capacity is wrong. want %v, got %v", 3, c)
 	}
@@ -43,7 +43,7 @@ func TestCache_AddWithReplace(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 	t.Logf("cache created.")
-	c := cache.Cap
+	c := cache.Cap()
 	if c != 2 {
 		t.Errorf("capacity is wrong. want %v, got %v", 2, c)
 	}
@@ -692,10 +692,10 @@ func TestCache_Resize(t *testing.T) {
 	if diff != 0 {
 		t.Errorf("diff needs to be 0, but it is %v", diff)
 	}
-	if cache.Cap != 8 {
-		t.Errorf("capacity should be 8, but it is %v", cache.Cap)
+	if cache.Cap() != 8 {
+		t.Errorf("capacity should be 8, but it is %v", cache.Cap())
 	}
-	t.Logf("capacity is %v", cache.Cap)
+	t.Logf("capacity is %v", cache.Cap())
 	t.Logf("diff is %v", diff)
 }
 
@@ -711,10 +711,10 @@ func TestCache_ResizeEqualLenSize(t *testing.T) {
 	if diff != 0 {
 		t.Errorf("diff needs to be 0, but it is %v", diff)
 	}
-	if cache.Cap != 5 {
-		t.Errorf("capacity should be 5, but it is %v", cache.Cap)
+	if cache.Cap() != 5 {
+		t.Errorf("capacity should be 5, but it is %v", cache.Cap())
 	}
-	t.Logf("capacity is %v", cache.Cap)
+	t.Logf("capacity is %v", cache.Cap())
 	t.Logf("diff is %v", diff)
 }
 
@@ -730,10 +730,10 @@ func TestCache_ResizeEqualCapLenSize(t *testing.T) {
 	if diff != 0 {
 		t.Errorf("diff needs to be 0, but it is %v", diff)
 	}
-	if cache.Cap != 10 {
-		t.Errorf("capacity should be 10, but it is %v", cache.Cap)
+	if cache.Cap() != 10 {
+		t.Errorf("capacity should be 10, but it is %v", cache.Cap())
 	}
-	t.Logf("capacity is %v", cache.Cap)
+	t.Logf("capacity is %v", cache.Cap())
 	t.Logf("diff is %v", diff)
 }
 
@@ -749,10 +749,10 @@ func TestCache_ResizeExceedCap(t *testing.T) {
 	if diff != 0 {
 		t.Errorf("diff needs to be 0, but it is %v", diff)
 	}
-	if cache.Cap != 12 {
-		t.Errorf("capacity should be 8, but it is %v", cache.Cap)
+	if cache.Cap() != 12 {
+		t.Errorf("capacity should be 8, but it is %v", cache.Cap())
 	}
-	t.Logf("capacity is %v", cache.Cap)
+	t.Logf("capacity is %v", cache.Cap())
 	t.Logf("diff is %v", diff)
 }
 
@@ -783,8 +783,8 @@ func TestCache_ResizeDecreaseCap(t *testing.T) {
 	if diff != 2 {
 		t.Errorf("diff needs to be 2, but it is %v", diff)
 	}
-	if cache.Cap != 3 {
-		t.Errorf("new capacity needs to be 3, but it is %v", cache.Cap)
+	if cache.Cap() != 3 {
+		t.Errorf("new capacity needs to be 3, but it is %v", cache.Cap())
 	}
 
 	order := []string{k + k + k + k + k, k + k + k + k, k + k + k}
