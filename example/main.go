@@ -75,6 +75,10 @@ func main() {
 		fmt.Println("Oldest data in cache did not remove.")
 	}
 
+	// Change the capacity of the cache
+	c.Resize(10)
+	fmt.Println("new cache capacity is", c.Cap)
+
 	// Clear cache. Remove everything from cache.
 	c.Clear()
 	fmt.Printf("cache cleared. length is %v\n", c.Len)
