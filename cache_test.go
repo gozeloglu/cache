@@ -28,7 +28,7 @@ func TestCache_Add(t *testing.T) {
 	}
 
 	t.Logf("%s-%s key-value pair added.", k, v)
-	l := cache.Len
+	l := cache.Len()
 	if l != 1 {
 		t.Errorf("length is wrong. want %v, got %v", 1, l)
 	}
@@ -55,15 +55,15 @@ func TestCache_AddWithReplace(t *testing.T) {
 			t.Errorf(err.Error())
 		}
 		t.Logf("new item added.")
-		if i == 0 && cache.Len != 1 {
-			t.Errorf("len must be 1, but it is %v", cache.Len)
+		if i == 0 && cache.Len() != 1 {
+			t.Errorf("len must be 1, but it is %v", cache.Len())
 		}
-		if i == 1 && cache.Len != 2 {
-			t.Errorf("len must be 2, but it is %v", cache.Len)
+		if i == 1 && cache.Len() != 2 {
+			t.Errorf("len must be 2, but it is %v", cache.Len())
 		}
 	}
-	if cache.Len != 2 {
-		t.Errorf("len needs to be 2, but it is %v", cache.Len)
+	if cache.Len() != 2 {
+		t.Errorf("len needs to be 2, but it is %v", cache.Len())
 	}
 	fKey, fVal := cache.lst.Front().Value.(Item).Val.(string), cache.lst.Front().Value.(Item).Key
 	sKey, sVal := cache.lst.Back().Value.(Item).Val.(string), cache.lst.Back().Value.(Item).Key
@@ -159,7 +159,7 @@ func TestCache_GetFrontElement(t *testing.T) {
 	if val != v+v+v {
 		t.Errorf("expected value is %s, got %s", v+v+v, val)
 	}
-	if cache.Len != cache.lst.Len() {
+	if cache.Len() != cache.lst.Len() {
 		t.Errorf("expected value is %s, got %s", v+v+v, val)
 	}
 	order := []string{k + k + k, k + k, k}
@@ -200,8 +200,8 @@ func TestCache_GetMiddleElement(t *testing.T) {
 	if val != v+v {
 		t.Errorf("expected value is %s, got %s", v+v, val)
 	}
-	if cache.Len != cache.lst.Len() {
-		t.Errorf("cache length is wrong. want %v, got %v", cache.Len, cache.lst.Len())
+	if cache.Len() != cache.lst.Len() {
+		t.Errorf("cache length is wrong. want %v, got %v", cache.Len(), cache.lst.Len())
 	}
 	order := []string{k + k, k + k + k, k}
 	i := 0
@@ -241,7 +241,7 @@ func TestCache_GetBackElement(t *testing.T) {
 	if val != v {
 		t.Errorf("expected value is %s, got %s", v, val)
 	}
-	if cache.Len != cache.lst.Len() {
+	if cache.Len() != cache.lst.Len() {
 		t.Errorf("expected value is %s, got %s", v, val)
 	}
 	order := []string{k, k + k + k, k + k}
@@ -271,8 +271,8 @@ func TestCache_Remove(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if cache.Len != 0 {
-		t.Errorf("cache length should be 0, but got %v", cache.Len)
+	if cache.Len() != 0 {
+		t.Errorf("cache length should be 0, but got %v", cache.Len())
 	}
 	t.Logf("%s-%s pair removed successfully.", k, v)
 }
@@ -352,8 +352,8 @@ func TestCache_ContainsEmptyCache(t *testing.T) {
 	if found {
 		t.Errorf("%s needs to be not exists, but it is found.", k)
 	}
-	if cache.Len != 0 {
-		t.Errorf("cache needs to be empty, but it is not. len: %v", cache.Len)
+	if cache.Len() != 0 {
+		t.Errorf("cache needs to be empty, but it is not. len: %v", cache.Len())
 	}
 	t.Log(found)
 	t.Logf("%s does not exists.", k)
@@ -424,8 +424,8 @@ func TestCache_Clear(t *testing.T) {
 	t.Logf("%s-%s added.", k, v)
 
 	cache.Clear()
-	if cache.Len != 0 {
-		t.Errorf("expected length is %v, got %v", 0, cache.Len)
+	if cache.Len() != 0 {
+		t.Errorf("expected length is %v, got %v", 0, cache.Len())
 	}
 	if cache.lst.Len() != 0 {
 		t.Errorf("expected length of list.Len() is %v, got %v", 0, cache.lst.Len())
@@ -442,8 +442,8 @@ func TestCache_ClearEmptyCache(t *testing.T) {
 	t.Logf("cache cretead.")
 
 	cache.Clear()
-	if cache.Len != 0 {
-		t.Errorf("expected length is %v, got %v", 0, cache.Len)
+	if cache.Len() != 0 {
+		t.Errorf("expected length is %v, got %v", 0, cache.Len())
 	}
 	if cache.lst.Len() != 0 {
 		t.Errorf("expected length of list.Len() is %v, got %v", 0, cache.lst.Len())
@@ -473,8 +473,8 @@ func TestCache_Keys(t *testing.T) {
 	}
 
 	keys := cache.Keys()
-	if len(keys) != cache.Len {
-		t.Errorf("keys length and cache length are not the same.\nkeys length: %v, cache length: %v", len(keys), cache.Len)
+	if len(keys) != cache.Len() {
+		t.Errorf("keys length and cache length are not the same.\nkeys length: %v, cache length: %v", len(keys), cache.Len())
 	}
 	if len(keys) != len(pairs) {
 		t.Errorf("keys length and pairs length are not the same.\nkeys length: %v, cache length: %v", len(keys), len(pairs))
@@ -495,8 +495,8 @@ func TestCache_KeysEmptyCache(t *testing.T) {
 	t.Logf("cache cretead.")
 
 	keys := cache.Keys()
-	if len(keys) != cache.Len {
-		t.Errorf("keys length and cache length are not the same.\nkeys length: %v, cache length: %v", len(keys), cache.Len)
+	if len(keys) != cache.Len() {
+		t.Errorf("keys length and cache length are not the same.\nkeys length: %v, cache length: %v", len(keys), cache.Len())
 	}
 	t.Logf("cache is empty.")
 }
@@ -605,7 +605,7 @@ func TestCache_RemoveOldest(t *testing.T) {
 		}
 		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
 	}
-	t.Logf("Data length in cache: %v", cache.Len)
+	t.Logf("Data length in cache: %v", cache.Len())
 
 	key, val, ok := cache.RemoveOldest()
 	if !ok {
@@ -617,8 +617,8 @@ func TestCache_RemoveOldest(t *testing.T) {
 	if val != v {
 		t.Errorf("expected oldest value is %s, but got %s", v, val.(Item).Val)
 	}
-	if cache.Len != 2 {
-		t.Errorf("expected cache len is %v, but got %v", 2, cache.Len)
+	if cache.Len() != 2 {
+		t.Errorf("expected cache len is %v, but got %v", 2, cache.Len())
 	}
 	t.Logf("Oldest data removed.")
 }
@@ -640,8 +640,8 @@ func TestCache_RemoveOldestEmptyCache(t *testing.T) {
 	if val != nil {
 		t.Error("expected value is nil, but got ", v)
 	}
-	if cache.Len != 0 {
-		t.Errorf("expected cache len is %v, but got %v", 0, cache.Len)
+	if cache.Len() != 0 {
+		t.Errorf("expected cache len is %v, but got %v", 0, cache.Len())
 	}
 }
 
@@ -664,7 +664,7 @@ func TestCache_RemoveOldestCacheItemCheck(t *testing.T) {
 		}
 		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
 	}
-	t.Logf("Data length in cache: %v", cache.Len)
+	t.Logf("Data length in cache: %v", cache.Len())
 
 	key, _, _ := cache.RemoveOldest()
 	if key != k {
@@ -687,7 +687,7 @@ func TestCache_Resize(t *testing.T) {
 	}
 	t.Logf("cache cretead.")
 
-	cache.Len = 5
+	cache.len = 5
 	diff := cache.Resize(8)
 	if diff != 0 {
 		t.Errorf("diff needs to be 0, but it is %v", diff)
@@ -706,7 +706,7 @@ func TestCache_ResizeEqualLenSize(t *testing.T) {
 	}
 	t.Logf("cache cretead.")
 
-	cache.Len = 5
+	cache.len = 5
 	diff := cache.Resize(5)
 	if diff != 0 {
 		t.Errorf("diff needs to be 0, but it is %v", diff)
@@ -725,7 +725,7 @@ func TestCache_ResizeEqualCapLenSize(t *testing.T) {
 	}
 	t.Logf("cache cretead.")
 
-	cache.Len = 10
+	cache.len = 10
 	diff := cache.Resize(10)
 	if diff != 0 {
 		t.Errorf("diff needs to be 0, but it is %v", diff)
@@ -744,7 +744,7 @@ func TestCache_ResizeExceedCap(t *testing.T) {
 	}
 	t.Logf("cache cretead.")
 
-	cache.Len = 5
+	cache.len = 5
 	diff := cache.Resize(12)
 	if diff != 0 {
 		t.Errorf("diff needs to be 0, but it is %v", diff)
@@ -777,7 +777,7 @@ func TestCache_ResizeDecreaseCap(t *testing.T) {
 		}
 		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
 	}
-	t.Logf("Data length in cache: %v", cache.Len)
+	t.Logf("Data length in cache: %v", cache.Len())
 
 	diff := cache.Resize(3)
 	if diff != 2 {
@@ -795,4 +795,29 @@ func TestCache_ResizeDecreaseCap(t *testing.T) {
 		i++
 	}
 	t.Logf("new cache order is true")
+}
+
+func TestCache_Len(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+	}
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+
+	if cache.Len() != 2 {
+		t.Errorf("cache length is wrong. expected %v, got %v", 2, cache.Len())
+	}
+	t.Logf("Data length in cache: %v", cache.Len())
 }

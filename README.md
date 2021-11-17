@@ -57,7 +57,7 @@ func main() {
 	for _, k := range keys {
 		fmt.Println(k)
 	}
-	fmt.Printf("cache length: %v\n", c.Len)
+	fmt.Printf("cache length: %v\n", c.Len())
 
 	// Remove data from cache via key
 	err = c.Remove("foo")
@@ -102,8 +102,8 @@ func main() {
 
 	// Clear cache. Remove everything from cache.
 	c.Clear()
-	fmt.Printf("cache cleared. length is %v\n", c.Len)
-	val, found = c.Get("foo")
+	fmt.Printf("cache cleared. length is %v\n", c.Len())
+	_, found = c.Get("foo")
 	if !found {
 		fmt.Println("key does not exist.")
 	}

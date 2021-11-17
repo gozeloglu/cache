@@ -9,8 +9,8 @@ import (
 
 // Cache is the main cache type.
 type Cache struct {
-	// Len is the total cached data count.
-	Len int
+	// len is the total cached data count.
+	len int
 
 	// Cap is the maximum capacity of the cache.
 	Cap int
@@ -79,7 +79,7 @@ func (c *Cache) Add(key string, val interface{}, exp time.Duration) error {
 		Val:        val,
 		Expiration: exp,
 	}
-	if c.Len == c.Cap {
+	if c.Len() == c.Cap {
 		c.mu.Lock()
 		lruKey := c.getLRU()
 		c.delete(lruKey.Key)
@@ -87,7 +87,7 @@ func (c *Cache) Add(key string, val interface{}, exp time.Duration) error {
 	}
 	c.mu.Lock()
 	c.lst.PushFront(item)
-	c.Len++
+	c.len++
 	c.mu.Unlock()
 	return nil
 }
@@ -96,7 +96,7 @@ func (c *Cache) Add(key string, val interface{}, exp time.Duration) error {
 // indicates whether found. If there is no such data in cache, it returns nil
 // and false.
 func (c *Cache) Get(key string) (interface{}, bool) {
-	if c.Len == 0 {
+	if c.Len() == 0 {
 		return nil, false
 	}
 	c.mu.Lock()
@@ -114,7 +114,7 @@ func (c *Cache) Get(key string) (interface{}, bool) {
 // Remove deletes the item from the cache. Updates the length of the cache
 // decrementing by one.
 func (c *Cache) Remove(key string) error {
-	if c.Len == 0 {
+	if c.Len() == 0 {
 		return errors.New("empty cache")
 	}
 
@@ -128,7 +128,7 @@ func (c *Cache) Remove(key string) error {
 // on cache or not. Calling this function doesn't change the access order of
 // the cache.
 func (c *Cache) Contains(key string) bool {
-	if c.Len == 0 {
+	if c.Len() == 0 {
 		return false
 	}
 	c.mu.Lock()
@@ -164,7 +164,7 @@ func (c *Cache) Keys() []string {
 
 // Peek returns the given key without updating access frequency of the item.
 func (c *Cache) Peek(key string) (interface{}, bool) {
-	if c.Len == 0 {
+	if c.Len() == 0 {
 		return nil, false
 	}
 	c.mu.Lock()
@@ -193,6 +193,11 @@ func (c *Cache) Resize(size int) int {
 	return diff
 }
 
+// Len returns length of the cache.
+func (c *Cache) Len() int {
+	return c.len
+}
+
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
 func (c *Cache) get(key string) (*list.Element, bool) {
@@ -211,7 +216,7 @@ func (c *Cache) delete(key string) {
 		return
 	}
 	c.lst.Remove(v)
-	c.Len--
+	c.len--
 }
 
 // getLRU returns least recently used item from list.
@@ -223,13 +228,13 @@ func (c *Cache) getLRU() Item {
 func (c *Cache) clear() {
 	for e := c.lst.Front(); e != nil; e = e.Next() {
 		c.lst.Remove(e)
-		c.Len--
+		c.len--
 	}
 }
 
 // removeOldest removes the oldest data from the cache.
 func (c *Cache) removeOldest() (key string, val interface{}, ok bool) {
-	if c.Len == 0 {
+	if c.Len() == 0 {
 		return "", nil, false
 	}
 	oldest := c.getLRU()
@@ -243,8 +248,8 @@ func (c *Cache) removeOldest() (key string, val interface{}, ok bool) {
 // the cache if the size is lower than length of the cache.
 func (c *Cache) resize(size int) int {
 	var diff int
-	if size < c.Len {
-		diff = c.Len - size
+	if size < c.Len() {
+		diff = c.Len() - size
 	}
 
 	for i := 0; i < diff; i++ {
