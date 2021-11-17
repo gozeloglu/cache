@@ -585,3 +585,97 @@ func TestCache_PeekFreqCheck(t *testing.T) {
 	}
 	t.Logf("cache order is true after peek.")
 }
+
+func TestCache_RemoveOldest(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+	}
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+	t.Logf("Data length in cache: %v", cache.Len)
+
+	key, val, ok := cache.RemoveOldest()
+	if !ok {
+		t.Errorf("expected ok value is %v, but got %v", true, ok)
+	}
+	if key != k {
+		t.Errorf("expected oldest key is %s, but got %s", k, key)
+	}
+	if val != v {
+		t.Errorf("expected oldest value is %s, but got %s", v, val.(Item).Val)
+	}
+	if cache.Len != 2 {
+		t.Errorf("expected cache len is %v, but got %v", 2, cache.Len)
+	}
+	t.Logf("Oldest data removed.")
+}
+
+func TestCache_RemoveOldestEmptyCache(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	key, val, ok := cache.RemoveOldest()
+	if ok {
+		t.Errorf("expected ok value is %v, but got %v", false, ok)
+	}
+	if key != "" {
+		t.Errorf("expected key is empty string, but got %s", key)
+	}
+	if val != nil {
+		t.Error("expected value is nil, but got ", v)
+	}
+	if cache.Len != 0 {
+		t.Errorf("expected cache len is %v, but got %v", 0, cache.Len)
+	}
+}
+
+func TestCache_RemoveOldestCacheItemCheck(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+	}
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+	t.Logf("Data length in cache: %v", cache.Len)
+
+	key, _, _ := cache.RemoveOldest()
+	if key != k {
+		t.Errorf("expected key is %s, but got %s", k, key)
+	}
+	order := []string{k + k + k, k + k}
+	for e, i := cache.lst.Front(), 0; e != nil; e = e.Next() {
+		if tmpEle := e.Value.(Item).Key; tmpEle != order[i] {
+			t.Errorf("expected %s, got %s", order[i], tmpEle)
+		}
+		i++
+	}
+	t.Logf("cache order is true.")
+}

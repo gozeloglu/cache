@@ -173,6 +173,15 @@ func (c *Cache) Peek(key string) (interface{}, bool) {
 	return val.Value.(Item).Val, found
 }
 
+// RemoveOldest removes the least recently used one. Returns removed key, value,
+// and bool value that indicates whether remove operation is done successfully.
+func (c *Cache) RemoveOldest() (k string, v interface{}, ok bool) {
+	c.mu.Lock()
+	k, v, ok = c.removeOldest()
+	c.mu.Unlock()
+	return
+}
+
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
 func (c *Cache) get(key string) (*list.Element, bool) {
@@ -205,4 +214,16 @@ func (c *Cache) clear() {
 		c.lst.Remove(e)
 		c.Len--
 	}
+}
+
+// removeOldest removes the oldest data from the cache.
+func (c *Cache) removeOldest() (key string, val interface{}, ok bool) {
+	if c.Len == 0 {
+		return "", nil, false
+	}
+	oldest := c.getLRU()
+	key, val = oldest.Key, oldest.Val
+	c.delete(key)
+	ok = true
+	return
 }
