@@ -182,6 +182,17 @@ func (c *Cache) RemoveOldest() (k string, v interface{}, ok bool) {
 	return
 }
 
+// Resize changes the size of the capacity. If new capacity is lower than
+// existing capacity, the oldest items will be removed. It returns the number
+// of the removed oldest elements from the cache. If it is zero, means that
+// no data removed from the cache.
+func (c *Cache) Resize(size int) int {
+	c.mu.Lock()
+	diff := c.resize(size)
+	c.mu.Unlock()
+	return diff
+}
+
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
 func (c *Cache) get(key string) (*list.Element, bool) {
@@ -226,4 +237,20 @@ func (c *Cache) removeOldest() (key string, val interface{}, ok bool) {
 	c.delete(key)
 	ok = true
 	return
+}
+
+// resize changes the capacity of the cache. It prunes the oldest elements from
+// the cache if the size is lower than length of the cache.
+func (c *Cache) resize(size int) int {
+	var diff int
+	if size < c.Len {
+		diff = c.Len - size
+	}
+
+	for i := 0; i < diff; i++ {
+		c.removeOldest()
+	}
+	c.Cap = size
+
+	return diff
 }

@@ -679,3 +679,120 @@ func TestCache_RemoveOldestCacheItemCheck(t *testing.T) {
 	}
 	t.Logf("cache order is true.")
 }
+
+func TestCache_Resize(t *testing.T) {
+	cache, err := New(10, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	cache.Len = 5
+	diff := cache.Resize(8)
+	if diff != 0 {
+		t.Errorf("diff needs to be 0, but it is %v", diff)
+	}
+	if cache.Cap != 8 {
+		t.Errorf("capacity should be 8, but it is %v", cache.Cap)
+	}
+	t.Logf("capacity is %v", cache.Cap)
+	t.Logf("diff is %v", diff)
+}
+
+func TestCache_ResizeEqualLenSize(t *testing.T) {
+	cache, err := New(10, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	cache.Len = 5
+	diff := cache.Resize(5)
+	if diff != 0 {
+		t.Errorf("diff needs to be 0, but it is %v", diff)
+	}
+	if cache.Cap != 5 {
+		t.Errorf("capacity should be 5, but it is %v", cache.Cap)
+	}
+	t.Logf("capacity is %v", cache.Cap)
+	t.Logf("diff is %v", diff)
+}
+
+func TestCache_ResizeEqualCapLenSize(t *testing.T) {
+	cache, err := New(10, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	cache.Len = 10
+	diff := cache.Resize(10)
+	if diff != 0 {
+		t.Errorf("diff needs to be 0, but it is %v", diff)
+	}
+	if cache.Cap != 10 {
+		t.Errorf("capacity should be 10, but it is %v", cache.Cap)
+	}
+	t.Logf("capacity is %v", cache.Cap)
+	t.Logf("diff is %v", diff)
+}
+
+func TestCache_ResizeExceedCap(t *testing.T) {
+	cache, err := New(10, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	cache.Len = 5
+	diff := cache.Resize(12)
+	if diff != 0 {
+		t.Errorf("diff needs to be 0, but it is %v", diff)
+	}
+	if cache.Cap != 12 {
+		t.Errorf("capacity should be 8, but it is %v", cache.Cap)
+	}
+	t.Logf("capacity is %v", cache.Cap)
+	t.Logf("diff is %v", diff)
+}
+
+func TestCache_ResizeDecreaseCap(t *testing.T) {
+	cache, err := New(10, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+		{k + k + k + k, v + v + v + v},
+		{k + k + k + k + k, v + v + v + v + v},
+	}
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+	t.Logf("Data length in cache: %v", cache.Len)
+
+	diff := cache.Resize(3)
+	if diff != 2 {
+		t.Errorf("diff needs to be 2, but it is %v", diff)
+	}
+	if cache.Cap != 3 {
+		t.Errorf("new capacity needs to be 3, but it is %v", cache.Cap)
+	}
+
+	order := []string{k + k + k + k + k, k + k + k + k, k + k + k}
+	for e, i := cache.lst.Front(), 0; e != nil; e = e.Next() {
+		if tmpEle := e.Value.(Item).Key; tmpEle != order[i] {
+			t.Errorf("expected %s, got %s", order[i], tmpEle)
+		}
+		i++
+	}
+	t.Logf("new cache order is true")
+}
