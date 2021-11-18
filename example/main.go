@@ -83,7 +83,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	val, found  = c.Peek("fuzz")
+	val, found = c.Peek("fuzz")
 	if !found {
 		fmt.Println("not found.")
 	}

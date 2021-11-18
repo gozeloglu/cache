@@ -117,8 +117,14 @@ func main() {
 		fmt.Println("key does not exist.")
 	}
 }
+```
 
+### Testing
 
+You can run the tests with the following command.
+
+```
+go test .
 ```
 
 ### LICENSE
