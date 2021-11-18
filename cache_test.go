@@ -821,3 +821,16 @@ func TestCache_Len(t *testing.T) {
 	}
 	t.Logf("Data length in cache: %v", cache.Len())
 }
+
+func TestCache_Cap(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	if cache.Cap() != 3 {
+		t.Errorf("capacity should be 3, but it is %v", cache.Cap())
+	}
+	t.Logf("capacity is %v", cache.Cap())
+}
