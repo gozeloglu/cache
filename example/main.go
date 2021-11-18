@@ -79,6 +79,15 @@ func main() {
 	c.Resize(10)
 	fmt.Println("new cache capacity is", c.Cap())
 
+	err = c.Replace("fuzz", "fuzz_buzz")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	val, found  = c.Peek("fuzz")
+	if !found {
+		fmt.Println("not found.")
+	}
+	fmt.Printf("new value is %s\n", val)
 	// Clear cache. Remove everything from cache.
 	c.Clear()
 	fmt.Printf("cache cleared. length is %v\n", c.Len())
