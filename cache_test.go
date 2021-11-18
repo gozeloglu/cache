@@ -834,3 +834,72 @@ func TestCache_Cap(t *testing.T) {
 	}
 	t.Logf("capacity is %v", cache.Cap())
 }
+
+func TestCache_Replace(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+	}
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+	t.Logf("Data length in cache: %v", cache.Len())
+
+	err = cache.Replace(k, k+v)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	val, found := cache.Get(k)
+	if !found {
+		t.Errorf("%s does not exist.", k)
+	}
+	t.Logf("key (%s) value (%s) replaced with value (%s)", k, v, val)
+
+	order := []string{k, k + k + k, k + k}
+	for e, i := cache.lst.Front(), 0; e != nil; e = e.Next() {
+		if ele := e.Value.(Item).Key; ele != order[i] {
+			t.Errorf("expected %s, got %s", order[i], ele)
+		}
+		i++
+	}
+	t.Logf("order of the cache data is true.")
+}
+
+func TestCache_ReplaceNotExistKey(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+	}
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+	t.Logf("Data length in cache: %v", cache.Len())
+
+	err = cache.Replace(k+v, k+v)
+	if err == nil {
+		t.Errorf("it should return error because of not existing key.")
+	}
+	t.Logf("key did not change, because: %s", err.Error())
+}

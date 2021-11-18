@@ -203,6 +203,24 @@ func (c *Cache) Cap() int {
 	return c.cap
 }
 
+// Replace changes the value of the given key, if the key exists. If the key
+// does not exist, it returns error.
+func (c *Cache) Replace(key interface{}, val interface{}) error {
+	c.mu.Lock()
+	e, found := c.get(key)
+	if !found {
+		c.mu.Unlock()
+		return errors.New("key does not exist")
+	}
+	e.Value = Item{
+		Key:        key,
+		Val:        val,
+		Expiration: e.Value.(Item).Expiration,
+	}
+	c.mu.Unlock()
+	return nil
+}
+
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
 func (c *Cache) get(key interface{}) (*list.Element, bool) {
