@@ -87,6 +87,43 @@ func TestCache_NewNegativeCap(t *testing.T) {
 	t.Logf(err.Error())
 }
 
+func TestCache_AddExceedCap(t *testing.T) {
+	cache, err := New(1, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache created.")
+
+	err = cache.Add(k, v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added.", k, v)
+	t.Logf("len: %v, cap: %v", cache.Len(), cache.Cap())
+
+	err = cache.Add(k+k, v+v, 0)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("%s-%s added.", k+k, v+v)
+	t.Logf("len: %v, cap: %v", cache.Len(), cache.Cap())
+
+	v, found := cache.Peek(k + k)
+	if !found {
+		t.Errorf("%s needs to be found.", k+k)
+	}
+	t.Logf("%s in cache.", v)
+
+	v, f := cache.Peek(k)
+	if f {
+		t.Errorf("%s should not be in the cache.", k)
+	}
+	if v != nil {
+		t.Errorf("%v should be nil.", v)
+	}
+	t.Logf("%s not in cache.", k)
+}
+
 func TestCache_Get(t *testing.T) {
 	cache, err := New(1, Config{})
 	if err != nil {
@@ -584,6 +621,23 @@ func TestCache_PeekFreqCheck(t *testing.T) {
 		i++
 	}
 	t.Logf("cache order is true after peek.")
+}
+
+func TestCache_PeekNotExist(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	val, found := cache.Peek(k)
+	if found {
+		t.Errorf("found should be false")
+	}
+	if val != nil {
+		t.Errorf("val needs to be nil, but it is %v", val)
+	}
+	t.Logf("value is %v", val)
 }
 
 func TestCache_RemoveOldest(t *testing.T) {

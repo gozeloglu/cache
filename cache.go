@@ -170,6 +170,9 @@ func (c *Cache) Peek(key interface{}) (interface{}, bool) {
 	c.mu.Lock()
 	val, found := c.get(key)
 	c.mu.Unlock()
+	if !found {
+		return nil, found
+	}
 	return val.Value.(Item).Val, found
 }
 
