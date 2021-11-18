@@ -860,13 +860,13 @@ func TestCache_Replace(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	val, found := cache.Get(k)
+	val, found := cache.Peek(k)
 	if !found {
 		t.Errorf("%s does not exist.", k)
 	}
 	t.Logf("key (%s) value (%s) replaced with value (%s)", k, v, val)
 
-	order := []string{k, k + k + k, k + k}
+	order := []string{k + k + k, k + k, k}
 	for e, i := cache.lst.Front(), 0; e != nil; e = e.Next() {
 		if ele := e.Value.(Item).Key; ele != order[i] {
 			t.Errorf("expected %s, got %s", order[i], ele)
