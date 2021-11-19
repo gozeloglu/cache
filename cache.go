@@ -69,7 +69,7 @@ func New(cap int, config Config) (*Cache, error) {
 }
 
 // Add saves data to cache if it is not saved yet.
-func (c *Cache) Add(key interface{}, val interface{}, exp int64) error {
+func (c *Cache) Add(key interface{}, val interface{}, exp time.Duration) error {
 	_, found := c.get(key)
 	if found {
 		return errors.New("key already exists")
@@ -77,7 +77,7 @@ func (c *Cache) Add(key interface{}, val interface{}, exp int64) error {
 	item := Item{
 		Key:        key,
 		Val:        val,
-		Expiration: exp,
+		Expiration: time.Now().Add(exp).UnixNano(),
 	}
 	if c.Len() == c.Cap() {
 		c.mu.Lock()
