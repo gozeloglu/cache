@@ -1015,8 +1015,7 @@ func TestCache_ClearExpiredData(t *testing.T) {
 		{k + k + k, v + v + v},
 	}
 	for i := 0; i < len(pairs); i++ {
-		testTime := time.Now().Add(-4 * time.Hour).UnixNano()
-		err = cache.Add(pairs[i][0], pairs[i][1], testTime)
+		err = cache.Add(pairs[i][0], pairs[i][1], -1*time.Hour)
 		if err != nil {
 			t.Errorf(err.Error())
 		}
@@ -1045,14 +1044,12 @@ func TestCache_ClearExpiredSomeData(t *testing.T) {
 		{k + k + k, v + v + v},
 	}
 
-	var testTime int64
 	for i := 0; i < len(pairs); i++ {
 		if i == 1 {
-			testTime = time.Now().Add(1 * time.Hour).UnixNano()
+			err = cache.Add(pairs[i][0], pairs[i][1], 1*time.Hour)
 		} else {
-			testTime = time.Now().Add(-1 * time.Hour).UnixNano()
+			err = cache.Add(pairs[i][0], pairs[i][1], -1*time.Hour)
 		}
-		err = cache.Add(pairs[i][0], pairs[i][1], testTime)
 		if err != nil {
 			t.Errorf(err.Error())
 		}
@@ -1087,8 +1084,7 @@ func TestCache_ClearExpiredNoData(t *testing.T) {
 	}
 
 	for i := 0; i < len(pairs); i++ {
-		testTime := time.Now().Add(1 * time.Hour).UnixNano()
-		err = cache.Add(pairs[i][0], pairs[i][1], testTime)
+		err = cache.Add(pairs[i][0], pairs[i][1], 1*time.Hour)
 		if err != nil {
 			t.Errorf(err.Error())
 		}
