@@ -489,6 +489,36 @@ func TestCache_ClearEmptyCache(t *testing.T) {
 	t.Logf("empty cache cleared.")
 }
 
+func TestCache_ClearMoreThanOneDataCache(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+	}
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+
+	cache.Clear()
+	if cache.Len() != 0 {
+		t.Errorf("all data did not clear.")
+	}
+	if cache.lst.Front() != nil {
+		t.Errorf("front node is not nil. %s-%s", cache.lst.Front().Value.(Item).Key, cache.lst.Front().Value.(Item).Val)
+	}
+	t.Logf("all data removed.")
+}
+
 func TestCache_Keys(t *testing.T) {
 	cache, err := New(3, Config{})
 	if err != nil {
