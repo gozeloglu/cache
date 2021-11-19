@@ -18,6 +18,8 @@ go get github.com/gozeloglu/cache
 
 ### Example
 
+Here, there is an example usage of the package. 
+
 ```go
 package main
 
