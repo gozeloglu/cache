@@ -27,6 +27,9 @@ func TestCache_Add(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
+	if cache.lst.Front().Value.(Item).Expiration != 0 {
+		t.Errorf("expiration must be 0, but it is %v", cache.lst.Front().Value.(Item).Expiration)
+	}
 
 	t.Logf("%s-%s key-value pair added.", k, v)
 	l := cache.Len()

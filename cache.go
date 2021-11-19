@@ -68,7 +68,8 @@ func New(cap int, config Config) (*Cache, error) {
 	}, nil
 }
 
-// Add saves data to cache if it is not saved yet.
+// Add saves data to cache if it is not saved yet. If the capacity is full,
+// the least-recently used one will be removed and new data will be added.
 func (c *Cache) Add(key interface{}, val interface{}, exp time.Duration) error {
 	_, found := c.get(key)
 	if found {
@@ -78,6 +79,9 @@ func (c *Cache) Add(key interface{}, val interface{}, exp time.Duration) error {
 		Key:        key,
 		Val:        val,
 		Expiration: time.Now().Add(exp).UnixNano(),
+	}
+	if exp == 0 {
+		item.Expiration = 0
 	}
 	if c.Len() == c.Cap() {
 		c.mu.Lock()
