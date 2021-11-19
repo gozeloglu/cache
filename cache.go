@@ -13,7 +13,7 @@ type Cache struct {
 	CleanInterval time.Duration
 
 	// ExpirationTimeoutInterval indicates the time to delete expired items.
-	ExpirationTimeoutInterval time.Duration
+	ExpirationTimeoutInterval int64
 
 	// len is the total cached data count.
 	len int
@@ -37,7 +37,7 @@ type Item struct {
 	Val interface{}
 
 	// Expiration is the amount of time to saved on memory.
-	Expiration time.Duration
+	Expiration int64
 }
 
 // Config keeps configuration variables.
@@ -46,7 +46,7 @@ type Config struct {
 	CleanInterval time.Duration
 
 	// ExpirationTimeoutInterval indicates the time to delete expired items.
-	ExpirationTimeoutInterval time.Duration
+	ExpirationTimeoutInterval int64
 }
 
 // New creates a new cache and returns it with error type. Capacity of the cache
@@ -69,7 +69,7 @@ func New(cap int, config Config) (*Cache, error) {
 }
 
 // Add saves data to cache if it is not saved yet.
-func (c *Cache) Add(key interface{}, val interface{}, exp time.Duration) error {
+func (c *Cache) Add(key interface{}, val interface{}, exp int64) error {
 	_, found := c.get(key)
 	if found {
 		return errors.New("key already exists")
@@ -224,6 +224,18 @@ func (c *Cache) Replace(key interface{}, val interface{}) error {
 	return nil
 }
 
+// ClearExpiredData deletes the all expired data in cache.
+func (c *Cache) ClearExpiredData() {
+	if c.Len() == 0 {
+		return
+	}
+
+	c.mu.Lock()
+	now := time.Now().UnixNano()
+	c.clearExpiredData(now)
+	c.mu.Unlock()
+}
+
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
 func (c *Cache) get(key interface{}) (*list.Element, bool) {
@@ -286,4 +298,16 @@ func (c *Cache) resize(size int) int {
 	c.cap = size
 
 	return diff
+}
+
+// clearExpiredData removes the all expired data in cache.
+func (c *Cache) clearExpiredData(now int64) {
+	var next *list.Element
+	for e := c.lst.Front(); e != nil; e = next {
+		next = e.Next()
+		if exp := e.Value.(Item).Expiration; exp != 0 && exp < now {
+			c.lst.Remove(e)
+			c.len--
+		}
+	}
 }

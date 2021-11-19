@@ -2,6 +2,7 @@ package cache
 
 import (
 	"testing"
+	"time"
 )
 
 const (
@@ -986,4 +987,124 @@ func TestCache_ReplaceNotExistKey(t *testing.T) {
 		t.Errorf("it should return error because of not existing key.")
 	}
 	t.Logf("key did not change, because: %s", err.Error())
+}
+
+func TestCache_ClearExpiredDataEmptyCache(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+	t.Logf("Len: %v Cap: %v", cache.Len(), cache.Cap())
+
+	cache.ClearExpiredData()
+	t.Logf("Len: %v Cap: %v", cache.Len(), cache.Cap())
+	t.Logf("No data removed.")
+}
+
+func TestCache_ClearExpiredData(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+	}
+	for i := 0; i < len(pairs); i++ {
+		testTime := time.Now().Add(-4 * time.Hour).UnixNano()
+		err = cache.Add(pairs[i][0], pairs[i][1], testTime)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+	t.Logf("Len: %v Cap: %v", cache.Len(), cache.Cap())
+
+	cache.ClearExpiredData()
+	if cache.Len() != 0 {
+		t.Errorf("all data needs to be deleted, but the length is %v", cache.Len())
+	}
+	t.Logf("Len: %v Cap: %v", cache.Len(), cache.Cap())
+	t.Logf("All data removed.")
+}
+
+func TestCache_ClearExpiredSomeData(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+	}
+
+	var testTime int64
+	for i := 0; i < len(pairs); i++ {
+		if i == 1 {
+			testTime = time.Now().Add(1 * time.Hour).UnixNano()
+		} else {
+			testTime = time.Now().Add(-1 * time.Hour).UnixNano()
+		}
+		err = cache.Add(pairs[i][0], pairs[i][1], testTime)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+	t.Logf("Len: %v Cap: %v", cache.Len(), cache.Cap())
+
+	cache.ClearExpiredData()
+	if cache.Len() != 1 {
+		t.Errorf("cache len needs to be 1, but it is %v", cache.Len())
+	}
+	if cache.lst.Front().Value.(Item).Key != k+k {
+		gotKey := cache.lst.Front().Value.(Item).Key
+		gotVal := cache.lst.Front().Value.(Item).Val
+		t.Errorf("front data needs to be (%s-%s) pair, but it is (%s-%s).", k+k, v+v, gotKey, gotVal)
+	}
+	t.Logf("Len: %v, Cap: %v", cache.Len(), cache.Cap())
+	t.Logf("All data removed except one.")
+}
+
+func TestCache_ClearExpiredNoData(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+	}
+
+	for i := 0; i < len(pairs); i++ {
+		testTime := time.Now().Add(1 * time.Hour).UnixNano()
+		err = cache.Add(pairs[i][0], pairs[i][1], testTime)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+	t.Logf("Len: %v Cap: %v", cache.Len(), cache.Cap())
+
+	cache.ClearExpiredData()
+	if cache.Len() != 3 {
+		t.Errorf("cache len needs to be 3, but it is %v", cache.Len())
+	}
+	if cache.lst.Front().Value.(Item).Key != k+k+k {
+		gotKey := cache.lst.Front().Value.(Item).Key
+		gotVal := cache.lst.Front().Value.(Item).Val
+		t.Errorf("front data needs to be (%s-%s) pair, but it is (%s-%s).", k+k+k, v+v+v, gotKey, gotVal)
+	}
+	t.Logf("Len: %v, Cap: %v", cache.Len(), cache.Cap())
+	t.Logf("All data removed except one.")
 }
