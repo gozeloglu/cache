@@ -70,6 +70,7 @@ func New(cap int, config Config) (*Cache, error) {
 
 // Add saves data to cache if it is not saved yet. If the capacity is full,
 // the least-recently used one will be removed and new data will be added.
+// If you do not want to add an expired time for data, you need to pass 0.
 func (c *Cache) Add(key interface{}, val interface{}, exp time.Duration) error {
 	_, found := c.get(key)
 	if found {
