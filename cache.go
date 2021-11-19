@@ -252,7 +252,9 @@ func (c *Cache) getLRU() Item {
 
 // clear removes all elements from the list.
 func (c *Cache) clear() {
-	for e := c.lst.Front(); e != nil; e = e.Next() {
+	var next *list.Element
+	for e := c.lst.Front(); e != nil; e = next {
+		next = e.Next()
 		c.lst.Remove(e)
 		c.len--
 	}
