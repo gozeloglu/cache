@@ -1243,3 +1243,48 @@ func TestCache_UpdateExpirationDateEmptyCache(t *testing.T) {
 	}
 	t.Logf(err.Error())
 }
+
+func TestItem_Expired(t *testing.T) {
+	item := Item{
+		Key:        k,
+		Val:        v,
+		Expiration: time.Now().Add(time.Minute * -1).UnixNano(),
+	}
+
+	expired := item.Expired()
+	if !expired {
+		t.Errorf("It needs to be expired, but it is not expired. Value is %v", expired)
+	}
+	t.Logf("item did not expire")
+	t.Logf("expired value is %v", expired)
+}
+
+func TestItem_NotExpired(t *testing.T) {
+	item := Item{
+		Key:        k,
+		Val:        v,
+		Expiration: time.Now().Add(time.Hour * 1).UnixNano(),
+	}
+
+	expired := item.Expired()
+	if expired {
+		t.Errorf("It needs to not expired, but it is expired. Value is %v", expired)
+	}
+	t.Logf("item did not expire")
+	t.Logf("expired value is %v", expired)
+}
+
+func TestItem_ExpiredNotSet(t *testing.T) {
+	item := Item{
+		Key:        k,
+		Val:        v,
+		Expiration: 0,
+	}
+
+	expired := item.Expired()
+	if expired {
+		t.Errorf("It needs to not expired, but it is expired. Value is %v", expired)
+	}
+	t.Logf("item did not expire")
+	t.Logf("expired value is %v", expired)
+}

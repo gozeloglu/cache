@@ -259,6 +259,14 @@ func (c *Cache) UpdateExpirationDate(key interface{}, exp time.Duration) (interf
 	return c.update(key, nil, newExpTime)
 }
 
+// Expired returns true if the item expired.
+func (i Item) Expired() bool {
+	if i.Expiration == 0 {
+		return false
+	}
+	return i.Expiration < time.Now().UnixNano()
+}
+
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
 func (c *Cache) get(key interface{}) (*list.Element, bool) {
