@@ -10,7 +10,8 @@ const (
 	v = "bar"
 )
 
-// createCache is a helper function to create cache for test functions.
+// createCache is a helper function to create cache for test functions. It is
+// used for preventing code duplication.
 func createCache(cap int, t *testing.T) *Cache {
 	cache, err := New(cap)
 	if err != nil {
@@ -20,6 +21,18 @@ func createCache(cap int, t *testing.T) *Cache {
 	return cache
 }
 
+// addItems adds the pairs to cache. It is a helper function to prevent code
+// duplication.
+func addItems(cache *Cache, pairs [][]string, t *testing.T) {
+	for i := 0; i < len(pairs); i++ {
+		err := cache.Add(pairs[i][0], pairs[i][1], 0)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+}
+
 func TestCache_Add(t *testing.T) {
 	cache := createCache(3, t)
 	c := cache.Cap()
@@ -27,10 +40,8 @@ func TestCache_Add(t *testing.T) {
 		t.Errorf("capacity is wrong. want %v, got %v", 3, c)
 	}
 
-	err := cache.Add(k, v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	addItems(cache, [][]string{{k, v}}, t)
+
 	if cache.lst.Front().Value.(Item).Expiration != 0 {
 		t.Errorf("expiration must be 0, but it is %v", cache.lst.Front().Value.(Item).Expiration)
 	}
@@ -98,11 +109,7 @@ func TestCache_AddExceedCap(t *testing.T) {
 	t.Logf("%s-%s added.", k, v)
 	t.Logf("len: %v, cap: %v", cache.Len(), cache.Cap())
 
-	err = cache.Add(k+k, v+v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	t.Logf("%s-%s added.", k+k, v+v)
+	addItems(cache, [][]string{{k + k, v + v}}, t)
 	t.Logf("len: %v, cap: %v", cache.Len(), cache.Cap())
 
 	v, found := cache.Peek(k + k)
@@ -124,11 +131,7 @@ func TestCache_AddExceedCap(t *testing.T) {
 func TestCache_Get(t *testing.T) {
 	cache := createCache(1, t)
 
-	err := cache.Add(k, v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	t.Logf("%s-%s added.", k, v)
+	addItems(cache, [][]string{{k, v}}, t)
 
 	val, found := cache.Get(k)
 	if !found {
@@ -144,11 +147,8 @@ func TestCache_Get(t *testing.T) {
 func TestCache_GetNotFound(t *testing.T) {
 	cache := createCache(1, t)
 
-	err := cache.Add(k, v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	t.Logf("%s-%s added", k, v)
+	addItems(cache, [][]string{{k, v}}, t)
+
 	val, found := cache.Get("test")
 	if found {
 		t.Errorf("expected false, but got true")
@@ -166,13 +166,7 @@ func TestCache_GetFrontElement(t *testing.T) {
 		{k + k, v + v},
 		{k + k + k, v + v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 
 	val, found := cache.Get(k + k + k)
 	if !found {
@@ -203,13 +197,7 @@ func TestCache_GetMiddleElement(t *testing.T) {
 		{k + k, v + v},
 		{k + k + k, v + v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 
 	val, found := cache.Get(k + k)
 	if !found {
@@ -240,13 +228,7 @@ func TestCache_GetBackElement(t *testing.T) {
 		{k + k, v + v},
 		{k + k + k, v + v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 
 	val, found := cache.Get(k)
 	if !found {
@@ -271,13 +253,9 @@ func TestCache_GetBackElement(t *testing.T) {
 
 func TestCache_Remove(t *testing.T) {
 	cache := createCache(2, t)
+	addItems(cache, [][]string{{k, v}}, t)
 
-	err := cache.Add(k, v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	t.Logf("%s-%s added.", k, v)
-	err = cache.Remove(k)
+	err := cache.Remove(k)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -299,14 +277,9 @@ func TestCache_RemoveEmptyCache(t *testing.T) {
 
 func TestCache_AddRemoveGet(t *testing.T) {
 	cache := createCache(1, t)
+	addItems(cache, [][]string{{k, v}}, t)
 
-	err := cache.Add(k, v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	t.Logf("%s-%s added.", k, v)
-
-	err = cache.Remove(k)
+	err := cache.Remove(k)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -324,12 +297,7 @@ func TestCache_AddRemoveGet(t *testing.T) {
 
 func TestCache_Contains(t *testing.T) {
 	cache := createCache(1, t)
-
-	err := cache.Add(k, v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	t.Logf("%s-%s added.", k, v)
+	addItems(cache, [][]string{{k, v}}, t)
 
 	found := cache.Contains(k)
 	if !found {
@@ -355,12 +323,7 @@ func TestCache_ContainsEmptyCache(t *testing.T) {
 
 func TestCache_ContainsNonExistKey(t *testing.T) {
 	cache := createCache(1, t)
-
-	err := cache.Add(k, v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	t.Logf("%s-%s added.", k, v)
+	addItems(cache, [][]string{{k, v}}, t)
 
 	found := cache.Contains(k + k)
 	if found {
@@ -377,13 +340,7 @@ func TestCache_ContainsCacheOrder(t *testing.T) {
 		{k + k, v + v},
 		{k + k + k, v + v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 
 	order := []string{k + k + k, k + k, k}
 	i := 0
@@ -398,12 +355,7 @@ func TestCache_ContainsCacheOrder(t *testing.T) {
 
 func TestCache_Clear(t *testing.T) {
 	cache := createCache(3, t)
-
-	err := cache.Add(k, v, 0)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	t.Logf("%s-%s added.", k, v)
+	addItems(cache, [][]string{{k, v}}, t)
 
 	cache.Clear()
 	if cache.Len() != 0 {
@@ -438,13 +390,7 @@ func TestCache_ClearMoreThanOneDataCache(t *testing.T) {
 		{k + k, v + v},
 		{k + k + k, v + v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 
 	cache.Clear()
 	if cache.Len() != 0 {
@@ -464,13 +410,7 @@ func TestCache_Keys(t *testing.T) {
 		{k + k, v + v},
 		{k + k + k, v + v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 
 	keys := cache.Keys()
 	if len(keys) != cache.Len() {
@@ -505,13 +445,7 @@ func TestCache_Peek(t *testing.T) {
 		{k + k, v + v},
 		{k + k + k, v + v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 
 	val, found := cache.Peek(k)
 	if !found {
@@ -544,13 +478,7 @@ func TestCache_PeekFreqCheck(t *testing.T) {
 		{k + k, v + v},
 		{k + k + k, v + v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 
 	val, found := cache.Peek(k)
 	if !found {
@@ -591,13 +519,7 @@ func TestCache_RemoveOldest(t *testing.T) {
 		{k + k, v + v},
 		{k + k + k, v + v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 	t.Logf("Data length in cache: %v", cache.Len())
 
 	key, val, ok := cache.RemoveOldest()
@@ -642,13 +564,7 @@ func TestCache_RemoveOldestCacheItemCheck(t *testing.T) {
 		{k + k, v + v},
 		{k + k + k, v + v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 	t.Logf("Data length in cache: %v", cache.Len())
 
 	key, _, _ := cache.RemoveOldest()
@@ -735,13 +651,7 @@ func TestCache_ResizeDecreaseCap(t *testing.T) {
 		{k + k + k + k, v + v + v + v},
 		{k + k + k + k + k, v + v + v + v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 	t.Logf("Data length in cache: %v", cache.Len())
 
 	diff := cache.Resize(3)
@@ -769,13 +679,7 @@ func TestCache_Len(t *testing.T) {
 		{k, v},
 		{k + k, v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 
 	if cache.Len() != 2 {
 		t.Errorf("cache length is wrong. expected %v, got %v", 2, cache.Len())
@@ -800,13 +704,7 @@ func TestCache_Replace(t *testing.T) {
 		{k + k, v + v},
 		{k + k + k, v + v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 	t.Logf("Data length in cache: %v", cache.Len())
 
 	err := cache.Replace(k, k+v)
@@ -837,13 +735,7 @@ func TestCache_ReplaceNotExistKey(t *testing.T) {
 		{k + k, v + v},
 		{k + k + k, v + v + v},
 	}
-	for i := 0; i < len(pairs); i++ {
-		err := cache.Add(pairs[i][0], pairs[i][1], 0)
-		if err != nil {
-			t.Errorf(err.Error())
-		}
-		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
-	}
+	addItems(cache, pairs, t)
 	t.Logf("Data length in cache: %v", cache.Len())
 
 	err := cache.Replace(k+v, k+v)
