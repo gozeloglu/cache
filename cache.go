@@ -9,9 +9,6 @@ import (
 
 // Cache is the main cache type.
 type Cache struct {
-	// CleanInterval is the time duration to make cache empty.
-	CleanInterval time.Duration
-
 	// len is the total cached data count.
 	len int
 
@@ -37,15 +34,9 @@ type Item struct {
 	Expiration int64
 }
 
-// Config keeps configuration variables.
-type Config struct {
-	// CleanInterval is the time duration to make cache empty.
-	CleanInterval time.Duration
-}
-
 // New creates a new cache and returns it with error type. Capacity of the cache
 // needs to be more than zero.
-func New(cap int, config Config) (*Cache, error) {
+func New(cap int) (*Cache, error) {
 	if cap == 0 {
 		return nil, errors.New("capacity of the cache must be more than 0")
 	}
@@ -54,10 +45,9 @@ func New(cap int, config Config) (*Cache, error) {
 	}
 	lst := list.New()
 	return &Cache{
-		cap:           cap,
-		CleanInterval: config.CleanInterval,
-		mu:            sync.Mutex{},
-		lst:           lst,
+		cap: cap,
+		mu:  sync.Mutex{},
+		lst: lst,
 	}, nil
 }
 
@@ -225,7 +215,10 @@ func (c *Cache) Replace(key interface{}, val interface{}) error {
 
 // ClearExpiredData deletes the all expired data in cache.
 func (c *Cache) ClearExpiredData() {
-	if c.Len() == 0 {
+	c.mu.Lock()
+	l := c.Len()
+	c.mu.Unlock()
+	if l == 0 {
 		return
 	}
 
@@ -236,8 +229,9 @@ func (c *Cache) ClearExpiredData() {
 }
 
 // UpdateVal updates the value of the given key. If there is no such a data, error
-// will be returned. Cache data order is updated after updating the value.
-func (c *Cache) UpdateVal(key interface{}, val interface{}) (interface{}, error) {
+// will be returned. Cache data order is updated after updating the value. It
+// returns updated item.
+func (c *Cache) UpdateVal(key interface{}, val interface{}) (Item, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	return c.update(key, val, -1)
@@ -245,8 +239,8 @@ func (c *Cache) UpdateVal(key interface{}, val interface{}) (interface{}, error)
 
 // UpdateExpirationDate updates the expiration date of the given key. If there
 // is no such a data, error will be returned. Cache data order is updated after
-// updating the expiration time.
-func (c *Cache) UpdateExpirationDate(key interface{}, exp time.Duration) (interface{}, error) {
+// updating the expiration time. It returns updated item.
+func (c *Cache) UpdateExpirationDate(key interface{}, exp time.Duration) (Item, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	newExpTime := time.Now().Add(exp).Unix()
@@ -338,7 +332,7 @@ func (c *Cache) clearExpiredData(now int64) {
 }
 
 // update changes the val and/or expiration date.
-func (c *Cache) update(key interface{}, val interface{}, exp int64) (interface{}, error) {
+func (c *Cache) update(key interface{}, val interface{}, exp int64) (Item, error) {
 	var next *list.Element
 	for e := c.lst.Front(); e != nil; e = next {
 		next = e.Next()
@@ -360,5 +354,5 @@ func (c *Cache) update(key interface{}, val interface{}, exp int64) (interface{}
 			return newItem, nil
 		}
 	}
-	return nil, errors.New("there is no such key")
+	return Item{}, errors.New("there is no such key")
 }

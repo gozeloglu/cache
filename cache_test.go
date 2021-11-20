@@ -11,9 +11,7 @@ const (
 )
 
 func TestCache_Add(t *testing.T) {
-	cache, err := New(3, Config{
-		CleanInterval: 0,
-	})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -38,9 +36,7 @@ func TestCache_Add(t *testing.T) {
 }
 
 func TestCache_AddWithReplace(t *testing.T) {
-	cache, err := New(2, Config{
-		CleanInterval: 0,
-	})
+	cache, err := New(2)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -74,7 +70,7 @@ func TestCache_AddWithReplace(t *testing.T) {
 }
 
 func TestCache_NewZeroCap(t *testing.T) {
-	_, err := New(0, Config{})
+	_, err := New(0)
 	if err == nil {
 		t.Errorf("expected non-nil error, but got nil error.")
 	}
@@ -82,7 +78,7 @@ func TestCache_NewZeroCap(t *testing.T) {
 }
 
 func TestCache_NewNegativeCap(t *testing.T) {
-	_, err := New(-1, Config{})
+	_, err := New(-1)
 	if err == nil {
 		t.Errorf("expected non-nil error, but got nil error.")
 	}
@@ -90,7 +86,7 @@ func TestCache_NewNegativeCap(t *testing.T) {
 }
 
 func TestCache_AddExceedCap(t *testing.T) {
-	cache, err := New(1, Config{})
+	cache, err := New(1)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -127,7 +123,7 @@ func TestCache_AddExceedCap(t *testing.T) {
 }
 
 func TestCache_Get(t *testing.T) {
-	cache, err := New(1, Config{})
+	cache, err := New(1)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -151,7 +147,7 @@ func TestCache_Get(t *testing.T) {
 }
 
 func TestCache_GetNotFound(t *testing.T) {
-	cache, err := New(1, Config{})
+	cache, err := New(1)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -172,7 +168,7 @@ func TestCache_GetNotFound(t *testing.T) {
 }
 
 func TestCache_GetFrontElement(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -213,7 +209,7 @@ func TestCache_GetFrontElement(t *testing.T) {
 }
 
 func TestCache_GetMiddleElement(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -254,7 +250,7 @@ func TestCache_GetMiddleElement(t *testing.T) {
 }
 
 func TestCache_GetBackElement(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -295,7 +291,7 @@ func TestCache_GetBackElement(t *testing.T) {
 }
 
 func TestCache_Remove(t *testing.T) {
-	cache, err := New(2, Config{})
+	cache, err := New(2)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -317,7 +313,7 @@ func TestCache_Remove(t *testing.T) {
 }
 
 func TestCache_RemoveEmptyCache(t *testing.T) {
-	cache, err := New(1, Config{})
+	cache, err := New(1)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -331,7 +327,7 @@ func TestCache_RemoveEmptyCache(t *testing.T) {
 }
 
 func TestCache_AddRemoveGet(t *testing.T) {
-	cache, err := New(1, Config{})
+	cache, err := New(1)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -360,7 +356,7 @@ func TestCache_AddRemoveGet(t *testing.T) {
 }
 
 func TestCache_Contains(t *testing.T) {
-	cache, err := New(1, Config{})
+	cache, err := New(1)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -381,7 +377,7 @@ func TestCache_Contains(t *testing.T) {
 }
 
 func TestCache_ContainsEmptyCache(t *testing.T) {
-	cache, err := New(1, Config{})
+	cache, err := New(1)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -399,7 +395,7 @@ func TestCache_ContainsEmptyCache(t *testing.T) {
 }
 
 func TestCache_ContainsNonExistKey(t *testing.T) {
-	cache, err := New(1, Config{})
+	cache, err := New(1)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -419,7 +415,7 @@ func TestCache_ContainsNonExistKey(t *testing.T) {
 }
 
 func TestCache_ContainsCacheOrder(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -450,7 +446,7 @@ func TestCache_ContainsCacheOrder(t *testing.T) {
 }
 
 func TestCache_Clear(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -474,7 +470,7 @@ func TestCache_Clear(t *testing.T) {
 }
 
 func TestCache_ClearEmptyCache(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -492,7 +488,7 @@ func TestCache_ClearEmptyCache(t *testing.T) {
 }
 
 func TestCache_ClearMoreThanOneDataCache(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -522,7 +518,7 @@ func TestCache_ClearMoreThanOneDataCache(t *testing.T) {
 }
 
 func TestCache_Keys(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -557,7 +553,7 @@ func TestCache_Keys(t *testing.T) {
 }
 
 func TestCache_KeysEmptyCache(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -571,7 +567,7 @@ func TestCache_KeysEmptyCache(t *testing.T) {
 }
 
 func TestCache_Peek(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -601,7 +597,7 @@ func TestCache_Peek(t *testing.T) {
 }
 
 func TestCache_PeekEmptyCache(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -618,7 +614,7 @@ func TestCache_PeekEmptyCache(t *testing.T) {
 }
 
 func TestCache_PeekFreqCheck(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -656,7 +652,7 @@ func TestCache_PeekFreqCheck(t *testing.T) {
 }
 
 func TestCache_PeekNotExist(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -673,7 +669,7 @@ func TestCache_PeekNotExist(t *testing.T) {
 }
 
 func TestCache_RemoveOldest(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -710,7 +706,7 @@ func TestCache_RemoveOldest(t *testing.T) {
 }
 
 func TestCache_RemoveOldestEmptyCache(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -732,7 +728,7 @@ func TestCache_RemoveOldestEmptyCache(t *testing.T) {
 }
 
 func TestCache_RemoveOldestCacheItemCheck(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -767,7 +763,7 @@ func TestCache_RemoveOldestCacheItemCheck(t *testing.T) {
 }
 
 func TestCache_Resize(t *testing.T) {
-	cache, err := New(10, Config{})
+	cache, err := New(10)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -786,7 +782,7 @@ func TestCache_Resize(t *testing.T) {
 }
 
 func TestCache_ResizeEqualLenSize(t *testing.T) {
-	cache, err := New(10, Config{})
+	cache, err := New(10)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -805,7 +801,7 @@ func TestCache_ResizeEqualLenSize(t *testing.T) {
 }
 
 func TestCache_ResizeEqualCapLenSize(t *testing.T) {
-	cache, err := New(10, Config{})
+	cache, err := New(10)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -824,7 +820,7 @@ func TestCache_ResizeEqualCapLenSize(t *testing.T) {
 }
 
 func TestCache_ResizeExceedCap(t *testing.T) {
-	cache, err := New(10, Config{})
+	cache, err := New(10)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -843,7 +839,7 @@ func TestCache_ResizeExceedCap(t *testing.T) {
 }
 
 func TestCache_ResizeDecreaseCap(t *testing.T) {
-	cache, err := New(10, Config{})
+	cache, err := New(10)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -884,7 +880,7 @@ func TestCache_ResizeDecreaseCap(t *testing.T) {
 }
 
 func TestCache_Len(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -909,7 +905,7 @@ func TestCache_Len(t *testing.T) {
 }
 
 func TestCache_Cap(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -922,7 +918,7 @@ func TestCache_Cap(t *testing.T) {
 }
 
 func TestCache_Replace(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -963,7 +959,7 @@ func TestCache_Replace(t *testing.T) {
 }
 
 func TestCache_ReplaceNotExistKey(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -991,7 +987,7 @@ func TestCache_ReplaceNotExistKey(t *testing.T) {
 }
 
 func TestCache_ClearExpiredDataEmptyCache(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -1004,7 +1000,7 @@ func TestCache_ClearExpiredDataEmptyCache(t *testing.T) {
 }
 
 func TestCache_ClearExpiredData(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -1033,7 +1029,7 @@ func TestCache_ClearExpiredData(t *testing.T) {
 }
 
 func TestCache_ClearExpiredSomeData(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -1072,7 +1068,7 @@ func TestCache_ClearExpiredSomeData(t *testing.T) {
 }
 
 func TestCache_ClearExpiredNoData(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -1107,7 +1103,7 @@ func TestCache_ClearExpiredNoData(t *testing.T) {
 }
 
 func TestCache_UpdateVal(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -1133,14 +1129,14 @@ func TestCache_UpdateVal(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if newItem.(Item).Key != k {
-		t.Errorf("expected key is %s, got %s", k, newItem.(Item).Key)
+	if newItem.Key != k {
+		t.Errorf("expected key is %s, got %s", k, newItem.Key)
 	}
-	if newItem.(Item).Val != k+v {
-		t.Errorf("expected value is %s, got %s", k+v, newItem.(Item).Val)
+	if newItem.Val != k+v {
+		t.Errorf("expected value is %s, got %s", k+v, newItem.Val)
 	}
-	if newItem.(Item).Expiration != timeExp {
-		t.Errorf("expected expiration time is %v, got %v", timeExp, newItem.(Item).Expiration)
+	if newItem.Expiration != timeExp {
+		t.Errorf("expected expiration time is %v, got %v", timeExp, newItem.Expiration)
 	}
 	t.Logf("data is updated successfully.")
 
@@ -1157,7 +1153,7 @@ func TestCache_UpdateVal(t *testing.T) {
 }
 
 func TestCache_UpdateExpirationDate(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -1183,14 +1179,14 @@ func TestCache_UpdateExpirationDate(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if newItem.(Item).Key != k {
-		t.Errorf("expected key is %s, got %s", k, newItem.(Item).Key)
+	if newItem.Key != k {
+		t.Errorf("expected key is %s, got %s", k, newItem.Key)
 	}
-	if newItem.(Item).Val != v {
-		t.Errorf("expected value is %s, got %s", v, newItem.(Item).Val)
+	if newItem.Val != v {
+		t.Errorf("expected value is %s, got %s", v, newItem.Val)
 	}
-	if newItem.(Item).Expiration == timeExp {
-		t.Errorf("expiration time needs to be updated %v, got %v", timeExp, newItem.(Item).Expiration)
+	if newItem.Expiration == timeExp {
+		t.Errorf("expiration time needs to be updated %v, got %v", timeExp, newItem.Expiration)
 	}
 	t.Logf("data is updated successfully.")
 
@@ -1207,7 +1203,7 @@ func TestCache_UpdateExpirationDate(t *testing.T) {
 }
 
 func TestCache_UpdateValEmptyCache(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -1218,14 +1214,14 @@ func TestCache_UpdateValEmptyCache(t *testing.T) {
 	if err == nil {
 		t.Errorf("error needs to be not nil.")
 	}
-	if newItem != nil {
+	if newItem != (Item{}) {
 		t.Errorf("returned item needs to be nil.")
 	}
 	t.Logf(err.Error())
 }
 
 func TestCache_UpdateExpirationDateEmptyCache(t *testing.T) {
-	cache, err := New(3, Config{})
+	cache, err := New(3)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -1236,7 +1232,7 @@ func TestCache_UpdateExpirationDateEmptyCache(t *testing.T) {
 	if err == nil {
 		t.Errorf("error needs to be not nil.")
 	}
-	if newItem != nil {
+	if newItem != (Item{}) {
 		t.Errorf("returned item needs to be nil.")
 	}
 	t.Logf(err.Error())

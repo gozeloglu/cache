@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// Create a cache
-	c, err := cache.New(5, cache.Config{})
+	c, err := cache.New(5)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
