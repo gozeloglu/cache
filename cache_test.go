@@ -1107,3 +1107,139 @@ func TestCache_ClearExpiredNoData(t *testing.T) {
 	t.Logf("Len: %v, Cap: %v", cache.Len(), cache.Cap())
 	t.Logf("All data removed except one.")
 }
+
+func TestCache_UpdateVal(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+	}
+
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 1*time.Hour)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+	t.Logf("Len: %v Cap: %v", cache.Len(), cache.Cap())
+
+	timeExp := cache.lst.Back().Value.(Item).Expiration
+	newItem, err := cache.UpdateVal(k, k+v)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if newItem.(Item).Key != k {
+		t.Errorf("expected key is %s, got %s", k, newItem.(Item).Key)
+	}
+	if newItem.(Item).Val != k+v {
+		t.Errorf("expected value is %s, got %s", k+v, newItem.(Item).Val)
+	}
+	if newItem.(Item).Expiration != timeExp {
+		t.Errorf("expected expiration time is %v, got %v", timeExp, newItem.(Item).Expiration)
+	}
+	t.Logf("data is updated successfully.")
+
+	order := []string{k, k + k + k, k + k}
+	i := 0
+	for e := cache.lst.Front(); e != nil; e = e.Next() {
+		tmpItem := e.Value.(Item)
+		if tmpItem.Key != order[i] {
+			t.Errorf("expected key %s, got %s", order[i], tmpItem.Key)
+		}
+		i++
+	}
+	t.Logf("cache data order is true.")
+}
+
+func TestCache_UpdateExpirationDate(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+
+	pairs := [][]string{
+		{k, v},
+		{k + k, v + v},
+		{k + k + k, v + v + v},
+	}
+
+	for i := 0; i < len(pairs); i++ {
+		err = cache.Add(pairs[i][0], pairs[i][1], 1*time.Hour)
+		if err != nil {
+			t.Errorf(err.Error())
+		}
+		t.Logf("%s-%s added.", pairs[i][0], pairs[i][1])
+	}
+	t.Logf("Len: %v Cap: %v", cache.Len(), cache.Cap())
+
+	timeExp := cache.lst.Back().Value.(Item).Expiration
+	newItem, err := cache.UpdateExpirationDate(k, 2*time.Hour)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if newItem.(Item).Key != k {
+		t.Errorf("expected key is %s, got %s", k, newItem.(Item).Key)
+	}
+	if newItem.(Item).Val != v {
+		t.Errorf("expected value is %s, got %s", v, newItem.(Item).Val)
+	}
+	if newItem.(Item).Expiration == timeExp {
+		t.Errorf("expiration time needs to be updated %v, got %v", timeExp, newItem.(Item).Expiration)
+	}
+	t.Logf("data is updated successfully.")
+
+	order := []string{k, k + k + k, k + k}
+	i := 0
+	for e := cache.lst.Front(); e != nil; e = e.Next() {
+		tmpItem := e.Value.(Item)
+		if tmpItem.Key != order[i] {
+			t.Errorf("expected key %s, got %s", order[i], tmpItem.Key)
+		}
+		i++
+	}
+	t.Logf("cache data order is true.")
+}
+
+func TestCache_UpdateValEmptyCache(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+	t.Logf("Len: %v Cap: %v", cache.Len(), cache.Cap())
+
+	newItem, err := cache.UpdateVal(k, k+v)
+	if err == nil {
+		t.Errorf("error needs to be not nil.")
+	}
+	if newItem != nil {
+		t.Errorf("returned item needs to be nil.")
+	}
+	t.Logf(err.Error())
+}
+
+func TestCache_UpdateExpirationDateEmptyCache(t *testing.T) {
+	cache, err := New(3, Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	t.Logf("cache cretead.")
+	t.Logf("Len: %v Cap: %v", cache.Len(), cache.Cap())
+
+	newItem, err := cache.UpdateExpirationDate(k, time.Minute*5)
+	if err == nil {
+		t.Errorf("error needs to be not nil.")
+	}
+	if newItem != nil {
+		t.Errorf("returned item needs to be nil.")
+	}
+	t.Logf(err.Error())
+}

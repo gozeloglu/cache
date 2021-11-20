@@ -241,6 +241,24 @@ func (c *Cache) ClearExpiredData() {
 	c.mu.Unlock()
 }
 
+// UpdateVal updates the value of the given key. If there is no such a data, error
+// will be returned. Cache data order is updated after updating the value.
+func (c *Cache) UpdateVal(key interface{}, val interface{}) (interface{}, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.update(key, val, -1)
+}
+
+// UpdateExpirationDate updates the expiration date of the given key. If there
+// is no such a data, error will be returned. Cache data order is updated after
+// updating the expiration time.
+func (c *Cache) UpdateExpirationDate(key interface{}, exp time.Duration) (interface{}, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	newExpTime := time.Now().Add(exp).Unix()
+	return c.update(key, nil, newExpTime)
+}
+
 // get traverses the list from head to tail and looks at the given key at each
 // step. It can be considered data retrieve function for cache.
 func (c *Cache) get(key interface{}) (*list.Element, bool) {
@@ -315,4 +333,30 @@ func (c *Cache) clearExpiredData(now int64) {
 			c.len--
 		}
 	}
+}
+
+// update changes the val and/or expiration date.
+func (c *Cache) update(key interface{}, val interface{}, exp int64) (interface{}, error) {
+	var next *list.Element
+	for e := c.lst.Front(); e != nil; e = next {
+		next = e.Next()
+		if k := e.Value.(Item).Key; k == key {
+			if val == nil {
+				val = e.Value.(Item).Val
+			}
+			if exp == -1 {
+				exp = e.Value.(Item).Expiration
+			}
+
+			c.lst.Remove(e)
+			newItem := Item{
+				Key:        key,
+				Val:        val,
+				Expiration: exp,
+			}
+			c.lst.PushFront(newItem)
+			return newItem, nil
+		}
+	}
+	return nil, errors.New("there is no such key")
 }
