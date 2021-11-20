@@ -12,8 +12,7 @@ const (
 
 func TestCache_Add(t *testing.T) {
 	cache, err := New(3, Config{
-		CleanInterval:             0,
-		ExpirationTimeoutInterval: 0,
+		CleanInterval: 0,
 	})
 	if err != nil {
 		t.Errorf(err.Error())
@@ -40,8 +39,7 @@ func TestCache_Add(t *testing.T) {
 
 func TestCache_AddWithReplace(t *testing.T) {
 	cache, err := New(2, Config{
-		CleanInterval:             0,
-		ExpirationTimeoutInterval: 0,
+		CleanInterval: 0,
 	})
 	if err != nil {
 		t.Errorf(err.Error())

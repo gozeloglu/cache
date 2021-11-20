@@ -12,9 +12,6 @@ type Cache struct {
 	// CleanInterval is the time duration to make cache empty.
 	CleanInterval time.Duration
 
-	// ExpirationTimeoutInterval indicates the time to delete expired items.
-	ExpirationTimeoutInterval int64
-
 	// len is the total cached data count.
 	len int
 
@@ -44,9 +41,6 @@ type Item struct {
 type Config struct {
 	// CleanInterval is the time duration to make cache empty.
 	CleanInterval time.Duration
-
-	// ExpirationTimeoutInterval indicates the time to delete expired items.
-	ExpirationTimeoutInterval int64
 }
 
 // New creates a new cache and returns it with error type. Capacity of the cache
@@ -60,11 +54,10 @@ func New(cap int, config Config) (*Cache, error) {
 	}
 	lst := list.New()
 	return &Cache{
-		cap:                       cap,
-		CleanInterval:             config.CleanInterval,
-		ExpirationTimeoutInterval: config.ExpirationTimeoutInterval,
-		mu:                        sync.Mutex{},
-		lst:                       lst,
+		cap:           cap,
+		CleanInterval: config.CleanInterval,
+		mu:            sync.Mutex{},
+		lst:           lst,
 	}, nil
 }
 
@@ -212,7 +205,8 @@ func (c *Cache) Cap() int {
 }
 
 // Replace changes the value of the given key, if the key exists. If the key
-// does not exist, it returns error.
+// does not exist, it returns error. Calling Replace function does not change
+// the cache order.
 func (c *Cache) Replace(key interface{}, val interface{}) error {
 	c.mu.Lock()
 	e, found := c.get(key)
