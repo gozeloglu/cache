@@ -1,4 +1,4 @@
-# cache
+# cache [![Go Reference](https://pkg.go.dev/badge/github.com/gozeloglu/cache.svg)](https://pkg.go.dev/github.com/gozeloglu/cache) [![Go Report Card](https://goreportcard.com/badge/github.com/gozeloglu/cache)](https://goreportcard.com/report/github.com/gozeloglu/cache) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/gozeloglu/cache) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/gozeloglu/cache) [![LICENSE](https://img.shields.io/badge/license-MIT-green)](https://github.com/gozeloglu/cache/blob/main/LICENSE)
 
 cache is LRU-based cache package written in vanilla Go - with no package dependency. LRU stands for **Least Recently
 Used** and it is one of the famous cache replacement algorithm. It replaces newly added data with the least recently
@@ -7,6 +7,7 @@ used one.
 * Written in Vanilla Go, with no dependencies.
 * Safe for concurrent use.
 * Supports any data type for keys and values.
+* Supports time expiration.
 
 ### Installation
 
@@ -87,6 +88,11 @@ if err != nil {
 newItem, err := c.UpdateExpirationDate("foo", time.Hour * 4) // Cache data order is also updated
 if err != nil {
     fmt.Printf("%v", newItem.Expiration)
+}
+
+err = c.Replace("foo", "fuzz")  // Change value of the key without updating cache access order
+if err != nil {
+	fmt.Printf(err.Error())
 }
 ```
 
