@@ -67,16 +67,15 @@ func (c *Cache) Add(key interface{}, val interface{}, exp time.Duration) error {
 	if exp == 0 {
 		item.Expiration = 0
 	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	if c.Len() == c.Cap() {
-		c.mu.Lock()
 		lruKey := c.getLRU()
 		c.delete(lruKey.Key)
-		c.mu.Unlock()
 	}
-	c.mu.Lock()
+
 	c.lst.PushFront(item)
 	c.len++
-	c.mu.Unlock()
 	return nil
 }
 
