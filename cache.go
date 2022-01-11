@@ -87,14 +87,13 @@ func (c *Cache) Get(key interface{}) (interface{}, bool) {
 		return nil, false
 	}
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	val, found := c.get(key)
 	if val == nil {
-		c.mu.Unlock()
 		return nil, found
 	}
 	e := c.lst.Remove(val)
 	c.lst.PushFront(e)
-	c.mu.Unlock()
 	return val.Value.(Item).Val, found
 }
 
@@ -106,8 +105,8 @@ func (c *Cache) Remove(key interface{}) error {
 	}
 
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.delete(key)
-	c.mu.Unlock()
 	return nil
 }
 
@@ -119,20 +118,16 @@ func (c *Cache) Contains(key interface{}) bool {
 		return false
 	}
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	_, found := c.get(key)
-	if found {
-		c.mu.Unlock()
-		return true
-	}
-	c.mu.Unlock()
-	return false
+	return found
 }
 
 // Clear deletes all items from the cache.
 func (c *Cache) Clear() {
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.clear()
-	c.mu.Unlock()
 }
 
 // Keys returns all keys in cache. It does not change frequency of the item
@@ -141,10 +136,10 @@ func (c *Cache) Keys() []interface{} {
 	var keys []interface{}
 
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	for e := c.lst.Front(); e != nil; e = e.Next() {
 		keys = append(keys, e.Value.(Item).Key)
 	}
-	c.mu.Unlock()
 
 	return keys
 }
@@ -155,8 +150,8 @@ func (c *Cache) Peek(key interface{}) (interface{}, bool) {
 		return nil, false
 	}
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	val, found := c.get(key)
-	c.mu.Unlock()
 	if !found {
 		return nil, found
 	}
@@ -167,8 +162,8 @@ func (c *Cache) Peek(key interface{}) (interface{}, bool) {
 // and bool value that indicates whether remove operation is done successfully.
 func (c *Cache) RemoveOldest() (k interface{}, v interface{}, ok bool) {
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	k, v, ok = c.removeOldest()
-	c.mu.Unlock()
 	return
 }
 
@@ -178,8 +173,8 @@ func (c *Cache) RemoveOldest() (k interface{}, v interface{}, ok bool) {
 // no data removed from the cache.
 func (c *Cache) Resize(size int) int {
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	diff := c.resize(size)
-	c.mu.Unlock()
 	return diff
 }
 
@@ -198,9 +193,9 @@ func (c *Cache) Cap() int {
 // the cache order.
 func (c *Cache) Replace(key interface{}, val interface{}) error {
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	e, found := c.get(key)
 	if !found {
-		c.mu.Unlock()
 		return errors.New("key does not exist")
 	}
 	e.Value = Item{
@@ -208,23 +203,20 @@ func (c *Cache) Replace(key interface{}, val interface{}) error {
 		Val:        val,
 		Expiration: e.Value.(Item).Expiration,
 	}
-	c.mu.Unlock()
 	return nil
 }
 
 // ClearExpiredData deletes the all expired data in cache.
 func (c *Cache) ClearExpiredData() {
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	l := c.Len()
-	c.mu.Unlock()
 	if l == 0 {
 		return
 	}
 
-	c.mu.Lock()
 	now := time.Now().UnixNano()
 	c.clearExpiredData(now)
-	c.mu.Unlock()
 }
 
 // UpdateVal updates the value of the given key. If there is no such a data, error
