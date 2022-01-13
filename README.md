@@ -104,6 +104,22 @@ You can run the tests with the following command.
 go test .
 ```
 
+### Code Coverage
+
+You can get the code coverage information with the following command:
+
+```bash
+go test -cover
+```
+
+If you want to generate a graphical coverage report, you can run the following command:
+
+```bash
+go tool cover -html=coverage.out
+```
+
+A browser tab will be opened and you will be able to see the graphical report. It shows not tracked, not covered, and covered line on the source code. 
+
 ### LICENSE
 
 [MIT](https://github.com/gozeloglu/cache/blob/main/LICENSE)
