@@ -2,7 +2,6 @@ package cache
 
 import (
 	"container/list"
-	"errors"
 	"sync"
 	"time"
 )
@@ -38,10 +37,10 @@ type Item struct {
 // needs to be more than zero.
 func New(cap int) (*Cache, error) {
 	if cap == 0 {
-		return nil, errors.New("capacity of the cache must be more than 0")
+		return nil, errZeroCapacity
 	}
 	if cap < 0 {
-		return nil, errors.New("capacity cannot be negative")
+		return nil, errNegCapacity
 	}
 	lst := list.New()
 	return &Cache{
@@ -57,7 +56,7 @@ func New(cap int) (*Cache, error) {
 func (c *Cache) Add(key interface{}, val interface{}, exp time.Duration) error {
 	_, found := c.get(key)
 	if found {
-		return errors.New("key already exists")
+		return errKeyExist
 	}
 	item := Item{
 		Key:        key,
@@ -101,7 +100,7 @@ func (c *Cache) Get(key interface{}) (interface{}, bool) {
 // decrementing by one.
 func (c *Cache) Remove(key interface{}) error {
 	if c.Len() == 0 {
-		return errors.New("empty cache")
+		return errEmptyCache
 	}
 
 	c.mu.Lock()
@@ -196,7 +195,7 @@ func (c *Cache) Replace(key interface{}, val interface{}) error {
 	defer c.mu.Unlock()
 	e, found := c.get(key)
 	if !found {
-		return errors.New("key does not exist")
+		return errKeyNotExist
 	}
 	e.Value = Item{
 		Key:        key,
@@ -345,5 +344,5 @@ func (c *Cache) update(key interface{}, val interface{}, exp int64) (Item, error
 			return newItem, nil
 		}
 	}
-	return Item{}, errors.New("there is no such key")
+	return Item{}, errNoKey
 }
