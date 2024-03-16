@@ -13,6 +13,7 @@ const (
 // createCache is a helper function to create cache for test functions. It is
 // used for preventing code duplication.
 func createCache(cap int, t *testing.T) *Cache {
+	t.Helper()
 	cache, err := New(cap)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -24,6 +25,7 @@ func createCache(cap int, t *testing.T) *Cache {
 // addItems adds the pairs to cache. It is a helper function to prevent code
 // duplication.
 func addItems(cache *Cache, pairs [][]string, t *testing.T) {
+	t.Helper()
 	for i := 0; i < len(pairs); i++ {
 		err := cache.Add(pairs[i][0], pairs[i][1], 0)
 		if err != nil {
