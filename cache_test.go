@@ -14,7 +14,7 @@ const (
 
 // createCache is a helper function to create cache for test functions. It is
 // used for preventing code duplication.
-func createCache(cap int, t *testing.T) *Cache {
+func createCache(t *testing.T, cap int) *Cache {
 	t.Helper()
 	cache, err := New(cap)
 	if err != nil {
@@ -26,7 +26,7 @@ func createCache(cap int, t *testing.T) *Cache {
 
 // addItems adds the pairs to cache. It is a helper function to prevent code
 // duplication.
-func addItems(cache *Cache, pairs [][]string, t *testing.T) {
+func addItems(t *testing.T, cache *Cache, pairs [][]any) {
 	t.Helper()
 	for i := 0; i < len(pairs); i++ {
 		err := cache.Add(pairs[i][0], pairs[i][1], 0)
@@ -115,7 +115,7 @@ func TestCache_Add(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
+		c := createCache(t, tt.capacity)
 		t.Run(tt.name, func(t *testing.T) {
 			for _, pair := range tt.addPairs {
 				var (
@@ -163,7 +163,7 @@ func TestCache_New(t *testing.T) {
 		{
 			name:     "creates cache with given capacity, when capacity > 0",
 			capacity: 20,
-			want:     createCache(20, t),
+			want:     createCache(t, 20),
 			wantErr:  nil,
 		},
 	}
@@ -226,12 +226,8 @@ func TestCache_Get(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
-		for _, pair := range tt.addPairs {
-			k, _ := pair[0].(string)
-			v, _ := pair[1].(string)
-			addItems(c, [][]string{{k, v}}, t)
-		}
+		c := createCache(t, tt.capacity)
+		addItems(t, c, tt.addPairs)
 		t.Run(tt.name, func(t *testing.T) {
 			for _, pair := range tt.getPairs {
 				var (
@@ -295,12 +291,8 @@ func TestCache_Remove(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
-		for _, pair := range tt.addPairs {
-			k, _ := pair[0].(string)
-			v, _ := pair[1].(string)
-			addItems(c, [][]string{{k, v}}, t)
-		}
+		c := createCache(t, tt.capacity)
+		addItems(t, c, tt.addPairs)
 		originalLength := c.Len()
 		t.Run(tt.name, func(t *testing.T) {
 			for i, key := range tt.removeKeys {
@@ -375,12 +367,8 @@ func TestCache_Contains(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
-		for _, pair := range tt.addPairs {
-			k, _ := pair[0].(string)
-			v, _ := pair[1].(string)
-			addItems(c, [][]string{{k, v}}, t)
-		}
+		c := createCache(t, tt.capacity)
+		addItems(t, c, tt.addPairs)
 		t.Run(tt.name, func(t *testing.T) {
 			for i, key := range tt.containKeys {
 				found := c.Contains(key)
@@ -422,12 +410,8 @@ func TestCache_Clear(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
-		for _, pair := range tt.addPairs {
-			k, _ := pair[0].(string)
-			v, _ := pair[1].(string)
-			addItems(c, [][]string{{k, v}}, t)
-		}
+		c := createCache(t, tt.capacity)
+		addItems(t, c, tt.addPairs)
 		t.Run(tt.name, func(t *testing.T) {
 			c.Clear()
 			if c.Len() != 0 {
@@ -467,12 +451,8 @@ func TestCache_Keys(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
-		for _, pair := range tt.addPairs {
-			k, _ := pair[0].(string)
-			v, _ := pair[1].(string)
-			addItems(c, [][]string{{k, v}}, t)
-		}
+		c := createCache(t, tt.capacity)
+		addItems(t, c, tt.addPairs)
 		t.Run(tt.name, func(t *testing.T) {
 			got := c.Keys()
 			if len(got) != c.Len() {
@@ -524,12 +504,8 @@ func TestCache_Peek(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
-		for _, pair := range tt.addPairs {
-			k, _ := pair[0].(string)
-			v, _ := pair[1].(string)
-			addItems(c, [][]string{{k, v}}, t)
-		}
+		c := createCache(t, tt.capacity)
+		addItems(t, c, tt.addPairs)
 		t.Run(tt.name, func(t *testing.T) {
 			for _, pair := range tt.peekPairs {
 				var (
@@ -586,12 +562,8 @@ func TestCache_RemoveOldest(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
-		for _, pair := range tt.addPairs {
-			k, _ := pair[0].(string)
-			v, _ := pair[1].(string)
-			addItems(c, [][]string{{k, v}}, t)
-		}
+		c := createCache(t, tt.capacity)
+		addItems(t, c, tt.addPairs)
 		t.Run(tt.name, func(t *testing.T) {
 			gotKey, gotVal, gotOk := c.RemoveOldest()
 			if gotKey != tt.want[0] {
@@ -664,12 +636,8 @@ func TestCache_Resize(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
-		for _, pair := range tt.addPairs {
-			k, _ := pair[0].(string)
-			v, _ := pair[1].(string)
-			addItems(c, [][]string{{k, v}}, t)
-		}
+		c := createCache(t, tt.capacity)
+		addItems(t, c, tt.addPairs)
 		t.Run(tt.name, func(t *testing.T) {
 			got := c.Resize(tt.newCapacity)
 			if got != tt.want {
@@ -706,12 +674,8 @@ func TestCache_Len(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
-		for _, pair := range tt.addPairs {
-			k, _ := pair[0].(string)
-			v, _ := pair[1].(string)
-			addItems(c, [][]string{{k, v}}, t)
-		}
+		c := createCache(t, tt.capacity)
+		addItems(t, c, tt.addPairs)
 		t.Run(tt.name, func(t *testing.T) {
 			if got := c.Len(); got != tt.want {
 				t.Errorf("unexpected cache length, got %v want %v", got, tt.want)
@@ -735,12 +699,8 @@ func TestCache_Cap(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
-		for _, pair := range tt.addPairs {
-			k, _ := pair[0].(string)
-			v, _ := pair[1].(string)
-			addItems(c, [][]string{{k, v}}, t)
-		}
+		c := createCache(t, tt.capacity)
+		addItems(t, c, tt.addPairs)
 		t.Run(tt.name, func(t *testing.T) {
 			if got := c.Cap(); got != tt.want {
 				t.Errorf("unexpected cache capacity, got %v want %v", got, tt.want)
@@ -776,12 +736,8 @@ func TestCache_Replace(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
-		for _, pair := range tt.addPairs {
-			k, _ := pair[0].(string)
-			v, _ := pair[1].(string)
-			addItems(c, [][]string{{k, v}}, t)
-		}
+		c := createCache(t, tt.capacity)
+		addItems(t, c, tt.addPairs)
 		t.Run(tt.name, func(t *testing.T) {
 			err := c.Replace(tt.replacePair[0], tt.replacePair[1])
 			if !errors.Is(err, tt.wantErr) {
@@ -839,7 +795,7 @@ func TestCache_ClearExpiredData(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
+		c := createCache(t, tt.capacity)
 		addItemsWithExp(t, c, tt.addPairs)
 		t.Run(tt.name, func(t *testing.T) {
 			c.ClearExpiredData()
@@ -888,7 +844,7 @@ func TestCache_UpdateVal(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
+		c := createCache(t, tt.capacity)
 		addItemsWithExp(t, c, tt.addPairs)
 		t.Run(tt.name, func(t *testing.T) {
 			for i, pair := range tt.updatePairs {
@@ -953,7 +909,7 @@ func TestCache_UpdateExpirationDate(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		c := createCache(tt.capacity, t)
+		c := createCache(t, tt.capacity)
 		addItemsWithExp(t, c, tt.addPairs)
 		t.Run(tt.name, func(t *testing.T) {
 			for i, pair := range tt.updatePairs {
